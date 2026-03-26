@@ -112,7 +112,6 @@ function CommentBubble({
   isLiked,
   onLike,
   onReply,
-  isLastReply,
 }: {
   comment: FBComment;
   isReply: boolean;
@@ -122,24 +121,12 @@ function CommentBubble({
   isLastReply?: boolean;
 }) {
   return (
-    <div className={`flex gap-3 ${isReply ? 'pl-12 relative' : ''}`}>
-      {/* Connecting line for replies */}
-      {isReply && (
-        <div
-          className={`absolute left-[34px] top-0 w-[2px] bg-gray-200 ${
-            isLastReply ? 'h-5' : 'h-full'
-          }`}
-        />
-      )}
-      {isReply && (
-        <div className="absolute left-[34px] top-5 w-4 h-[2px] bg-gray-200 rounded-full" />
-      )}
-
+    <div className={`flex gap-3 ${isReply ? '' : ''}`}>
       {/* Avatar */}
       <div
         className={`shrink-0 ${isReply ? 'w-7 h-7' : 'w-9 h-9'} rounded-full ${getAvatarColor(
           comment.author
-        )} flex items-center justify-center shadow-sm z-10`}
+        )} flex items-center justify-center shadow-sm relative z-10`}
       >
         <span className={`text-white font-bold ${isReply ? 'text-[9px]' : 'text-[11px]'}`}>
           {getInitials(comment.author)}
@@ -417,13 +404,8 @@ export default function BookThread() {
                   transition={{ duration: 0.3, delay: ti * 0.05 }}
                   className="bg-white border border-gray-200/80 first:rounded-t-2xl last:rounded-b-2xl border-t-0 first:border-t"
                 >
-                  {/* ── Parent comment ── */}
-                  <div className="p-4 sm:p-5 relative">
-                    {/* Vertical line connecting to replies */}
-                    {thread.replies.length > 0 && (
-                      <div className="absolute left-[34px] sm:left-[38px] top-14 bottom-0 w-[2px] bg-gray-200" />
-                    )}
-
+                  <div className="p-4 sm:p-5">
+                    {/* ── Parent comment ── */}
                     <CommentBubble
                       comment={thread.parent}
                       isReply={false}
@@ -432,19 +414,24 @@ export default function BookThread() {
                       onReply={() => handleReply(thread.parent.id, thread.parent.author)}
                     />
 
-                    {/* ── Replies ── */}
+                    {/* ── Replies with Threads-style connector ── */}
                     {thread.replies.length > 0 && (
-                      <div className="mt-4 space-y-3">
+                      <div className="ml-[18px] mt-0 border-l-2 border-gray-200 pl-0">
                         {thread.replies.map((reply, ri) => (
-                          <CommentBubble
-                            key={reply.id}
-                            comment={reply}
-                            isReply
-                            isLastReply={ri === thread.replies.length - 1}
-                            isLiked={likedComments.has(reply.id)}
-                            onLike={() => handleCommentLike(reply.id)}
-                            onReply={() => handleReply(thread.parent.id, reply.author)}
-                          />
+                          <div key={reply.id} className="relative mt-3">
+                            {/* Horizontal connector from vertical line to reply avatar */}
+                            <div className="absolute left-0 top-[14px] w-5 h-0 border-t-2 border-gray-200" />
+                            <div className="ml-7">
+                              <CommentBubble
+                                comment={reply}
+                                isReply
+                                isLastReply={ri === thread.replies.length - 1}
+                                isLiked={likedComments.has(reply.id)}
+                                onLike={() => handleCommentLike(reply.id)}
+                                onReply={() => handleReply(thread.parent.id, reply.author)}
+                              />
+                            </div>
+                          </div>
                         ))}
                       </div>
                     )}

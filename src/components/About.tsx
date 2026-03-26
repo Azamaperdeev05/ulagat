@@ -201,7 +201,7 @@ export default function About() {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="bg-linear-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent"
               >
-                біріктіретін орта.
+                біріктіретін орта
               </motion.span>
             </motion.h2>
           </div>

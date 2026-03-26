@@ -24,7 +24,7 @@ export default function Gallery() {
             Галерея
           </span>
           <h2 className="text-3xl md:text-[42px] font-display font-semibold text-gray-900 tracking-tight">
-            Клубтың сәттері
+            Әсерлі сәттер
           </h2>
         </motion.div>
 
