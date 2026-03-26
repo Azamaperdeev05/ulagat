@@ -1,208 +1,286 @@
-import { motion } from 'framer-motion';
-import { BookOpen, Calendar, MapPin, BadgePercent } from 'lucide-react';
-
-const fadeUp = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-80px' },
-  transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
-};
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { BookOpen, Calendar, MapPin, BadgePercent, Music, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useRef } from 'react';
 
 const highlights = [
   {
     icon: Calendar,
-    title: '2022 жылдың қарашасынан',
+    title: '2022',
+    subtitle: 'жылдың қарашасынан',
     desc: 'Клуб 2022 жылдың қараша айынан бері тұрақты жұмыс істеп келеді.',
+    color: 'text-blue-500',
+    bg: 'bg-blue-500/10',
   },
   {
     icon: BookOpen,
-    title: 'Әр 2 аптада кітап талдау',
+    title: '2 апта',
+    subtitle: 'сайын кітап талдау',
     desc: '1-апта — әлем әдебиеті, 2-апта — қазақ әдебиеті.',
+    color: 'text-amber-500',
+    bg: 'bg-amber-500/10',
   },
   {
     icon: MapPin,
-    title: 'Qasymkitap кітап дүкені',
+    title: 'Qasymkitap',
+    subtitle: 'кітап дүкені',
     desc: 'Кездесулер Қарағанды қаласындағы Qasymkitap филиалында өтеді.',
+    color: 'text-green-500',
+    bg: 'bg-green-500/10',
   },
   {
     icon: BadgePercent,
-    title: '15% жеңілдік',
+    title: '15%',
+    subtitle: 'жеңілдік',
     desc: 'Qasymkitap баспасының әр кітабына Ұлағат оқырмандарына жеңілдік.',
+    color: 'text-purple-500',
+    bg: 'bg-purple-500/10',
   },
 ];
 
 export default function About() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+  const y1 = useTransform(scrollYProgress, [0, 1], [80, -80]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [40, -40]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.3, 1, 1, 0.3]);
+
   return (
-    <section id="about" className="relative py-28 lg:py-40 bg-white overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-gradient-to-br from-amber-50 via-orange-50/30 to-transparent rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-tl from-blue-50/40 via-indigo-50/20 to-transparent rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none" />
-
-      <div className="relative max-w-5xl mx-auto px-6">
-        {/* Header block with logo */}
+    <>
+      {/* ─── SECTION 1: About Hero — Apple-style full-width centered ─── */}
+      <section
+        ref={sectionRef}
+        id="about"
+        className="relative py-32 lg:py-48 bg-[#fafafa] overflow-hidden"
+      >
+        {/* Subtle parallax bg circles */}
         <motion.div
-          {...fadeUp}
-          className="text-center mb-20"
-        >
-          {/* Floating logo */}
+          style={{ y: y1 }}
+          className="absolute top-[-200px] left-[-100px] w-[700px] h-[700px] rounded-full bg-gradient-to-br from-amber-100/50 to-orange-100/20 blur-[100px] pointer-events-none"
+        />
+        <motion.div
+          style={{ y: y2 }}
+          className="absolute bottom-[-200px] right-[-100px] w-[600px] h-[600px] rounded-full bg-gradient-to-tl from-blue-100/30 to-indigo-100/10 blur-[100px] pointer-events-none"
+        />
+
+        <motion.div style={{ opacity }} className="relative max-w-[980px] mx-auto px-6">
+          {/* Centered eyebrow + title — Apple style */}
+          <div className="text-center mb-20 lg:mb-28">
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-[13px] font-semibold tracking-[0.25em] uppercase text-gray-400 mb-6"
+            >
+              Біз туралы
+            </motion.p>
+
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[40px] sm:text-[52px] md:text-[64px] lg:text-[76px] font-display font-semibold text-gray-900 leading-[1.05] tracking-[-0.025em]"
+            >
+              Кітапсүйер қауымды
+              <br />
+              <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
+                біріктіретін орта.
+              </span>
+            </motion.h2>
+          </div>
+
+          {/* Two-column content — Apple editorial */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+            {/* Left: Large pull quote */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p className="text-[28px] sm:text-[32px] md:text-[36px] font-display font-semibold text-gray-900 leading-[1.2] tracking-[-0.02em]">
+                Әдебиет арқылы ой бөлісіп, жаңа идеялармен алмасуға мүмкіндік беретін
+                <span className="text-gray-300"> ерекше орта.</span>
+              </p>
+            </motion.div>
+
+            {/* Right: Body text */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-6"
+            >
+              <p className="text-[17px] text-gray-500 leading-[1.7] font-light">
+                «Ulagat» оқырман клубы 2022 жылдың қараша айынан бері жұмыс
+                істеп келеді. Клуб аясында түрлі форматтағы әдеби кездесулер
+                ұйымдастырылып, кітап талдауы әр екі апта сайын тұрақты
+                түрде өткізіледі.
+              </p>
+              <p className="text-[17px] text-gray-500 leading-[1.7] font-light">
+                Әр айдың бірінші аптасында{' '}
+                <span className="font-medium text-gray-900">әлем әдебиеті</span>{' '}
+                талқыланса, екінші аптасында{' '}
+                <span className="font-medium text-gray-900">қазақ әдебиетінен</span>{' '}
+                шығармалар оқылады. Кездесулер Қарағанды қаласындағы Qasymkitap
+                кітап дүкенінің филиалында өтеді.
+              </p>
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ─── SECTION 2: Stats / Highlights — Apple-style feature grid ─── */}
+      <section className="py-24 lg:py-32 bg-white">
+        <div className="max-w-[1080px] mx-auto px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
+            {highlights.map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.7,
+                  delay: 0.1 * i,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="group relative p-8 lg:p-10 rounded-3xl hover:bg-gray-50 transition-colors duration-500"
+              >
+                <div
+                  className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center mb-6`}
+                >
+                  <item.icon className={`w-6 h-6 ${item.color}`} />
+                </div>
+                <h3 className="text-[32px] font-display font-bold text-gray-900 tracking-tight leading-none mb-1">
+                  {item.title}
+                </h3>
+                <p className="text-[13px] text-gray-400 font-medium mb-3">
+                  {item.subtitle}
+                </p>
+                <p className="text-[14px] text-gray-500 font-light leading-relaxed">
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SECTION 3: «Ұлағат үні» — Apple-style dark showcase ─── */}
+      <section className="relative py-28 lg:py-40 bg-[#1d1d1f] overflow-hidden">
+        {/* Ambient glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full bg-gradient-to-r from-amber-500/8 via-orange-500/5 to-transparent blur-[120px] pointer-events-none" />
+
+        <div className="relative max-w-[980px] mx-auto px-6">
+          <div className="text-center">
+            {/* Eyebrow */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-[13px] font-semibold tracking-[0.25em] uppercase text-amber-400/80 mb-6"
+            >
+              Музыка · Өнер · Рух
+            </motion.p>
+
+            {/* Title */}
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[40px] sm:text-[52px] md:text-[64px] lg:text-[76px] font-display font-semibold text-white leading-[1.05] tracking-[-0.025em] mb-6"
+            >
+              «Ұлағат үні»
+              <br />
+              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+                ансамблі.
+              </span>
+            </motion.h2>
+
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-[19px] text-gray-400 font-light leading-[1.6] max-w-2xl mx-auto mb-12"
+            >
+              «Ұлағат» оқырман клубы мүшелері ішіндегі өнерлі жандардан құрылды.
+              Қазіргі таңда ансамбльде 20 шақты адам бар. Өнерпаздар 15-ші
+              наурыз күні алғашқы күй кешін өткізді.
+            </motion.p>
+
+            {/* Stats row */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="flex items-center justify-center gap-12 sm:gap-16 mb-14"
+            >
+              {[
+                { value: '20+', label: 'Мүше' },
+                { value: '15.03', label: 'Алғашқы күй кеші' },
+                { value: '16', label: 'Өнерпаз' },
+              ].map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <p className="text-[36px] sm:text-[44px] font-display font-bold text-white tracking-tight leading-none">
+                    {stat.value}
+                  </p>
+                  <p className="text-[12px] text-gray-500 font-medium mt-2 tracking-wide uppercase">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Link
+                to="/ensemble"
+                className="group inline-flex items-center gap-2.5 text-[17px] text-amber-400 font-medium hover:text-amber-300 transition-colors"
+              >
+                Толығырақ білу
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SECTION 4: CTA join ─── */}
+      <section className="py-20 lg:py-24 bg-white">
+        <div className="max-w-[980px] mx-auto px-6 text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-900 to-gray-700 rounded-3xl shadow-2xl shadow-gray-900/20 mb-8"
-          >
-            <img
-              src="/ulagat (1).svg"
-              alt="ULAGAT Logo"
-              className="w-10 h-10 object-contain brightness-0 invert"
-            />
-          </motion.div>
-
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="block text-[12px] font-semibold text-accent tracking-[0.2em] uppercase mb-5"
-          >
-            Біз туралы
-          </motion.span>
-
-          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-display font-semibold text-gray-900 leading-[1.1] tracking-tight mb-4"
+            transition={{ duration: 0.6 }}
           >
-            Кітапсүйер қауымды{' '}
-            <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
-              біріктіретін орта.
-            </span>
-          </motion.h2>
-        </motion.div>
-
-        {/* Main story block — editorial layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-20">
-          {/* Left column — pull quote */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="lg:col-span-4 relative"
-          >
-            <div className="sticky top-32">
-              <div className="absolute -left-4 top-0 w-1 h-full bg-gradient-to-b from-amber-400 via-orange-400 to-transparent rounded-full" />
-              <blockquote className="pl-6">
-                <p className="text-xl sm:text-2xl font-display font-semibold text-gray-900 leading-snug mb-4 italic">
-                  «Әдебиет арқылы ой бөлісіп, жаңа идеялармен алмасуға мүмкіндік беретін ерекше орта»
-                </p>
-                <div className="flex items-center gap-3 mt-6">
-                  <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center">
-                    <span className="text-white text-sm font-display font-bold">U</span>
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-semibold text-gray-900">Ulagat Club</p>
-                    <p className="text-[11px] text-gray-400">est. 2022</p>
-                  </div>
-                </div>
-              </blockquote>
-            </div>
-          </motion.div>
-
-          {/* Right column — narrative text */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="lg:col-span-8"
-          >
-            <div className="space-y-6">
-              <p className="text-base md:text-lg text-gray-600 font-light leading-[1.8] first-letter:text-5xl first-letter:font-display first-letter:font-bold first-letter:text-gray-900 first-letter:float-left first-letter:mr-3 first-letter:mt-1">
-                «Ulagat» оқырман клубы 2022 жылдың қараша айынан бері жұмыс істеп келеді.
-                Бұл клуб – кітапсүйер қауымды біріктіретін, әдебиет арқылы ой бөлісіп,
-                жаңа идеялармен алмасуға мүмкіндік беретін ерекше орта.
-              </p>
-
-              <p className="text-base md:text-lg text-gray-600 font-light leading-[1.8]">
-                Клуб аясында түрлі форматтағы әдеби кездесулер ұйымдастырылып,
-                кітап талдауы әр екі апта сайын тұрақты түрде өткізіледі.
-                Әр айдың бірінші аптасында <span className="font-medium text-gray-900">әлем әдебиеті</span> талқыланса,
-                екінші аптасында <span className="font-medium text-gray-900">қазақ әдебиетінен</span> шығармалар оқылады.
-              </p>
-
-              <p className="text-base md:text-lg text-gray-600 font-light leading-[1.8]">
-                Кездесулер Қарағанды қаласындағы{' '}
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 bg-amber-50 text-amber-700 font-medium rounded-full text-[14px] border border-amber-200/60">
-                  📍 Qasymkitap
-                </span>{' '}
-                кітап дүкенінің филиалында өтеді.
-                Клубқа қатысу тегін, әрі Qasymkitap баспасының
-                әр кітабына Ұлағат оқырмандарына{' '}
-                <span className="inline-flex items-center gap-1 px-3 py-0.5 bg-green-50 text-green-700 font-semibold rounded-full text-[14px] border border-green-200/60">
-                  15% жеңілдік
-                </span>{' '}
-                қарастырылған.
-              </p>
-            </div>
-
-            {/* Decorative divider */}
-            <div className="flex items-center gap-4 my-10">
-              <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
-              <div className="flex gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-                <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
-              </div>
-              <div className="flex-1 h-px bg-gradient-to-l from-gray-200 to-transparent" />
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Highlight cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {highlights.map((item, i) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 * i }}
-              className="group relative p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-white hover:border-gray-200 hover:shadow-xl hover:shadow-gray-900/[0.04] transition-all duration-500"
+            <a
+              href="#join"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 rounded-full shadow-lg shadow-gray-900/20 hover:shadow-xl hover:bg-gray-800 transition-all duration-300 cursor-pointer"
             >
-              <div className="w-11 h-11 rounded-xl bg-white border border-gray-200/80 flex items-center justify-center mb-4 group-hover:bg-gray-900 group-hover:border-gray-900 transition-all duration-300 shadow-sm">
-                <item.icon className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors duration-300" />
-              </div>
-              <h3 className="text-[15px] font-semibold text-gray-900 mb-1.5 tracking-tight">
-                {item.title}
-              </h3>
-              <p className="text-[13px] text-gray-500 font-light leading-relaxed">
-                {item.desc}
-              </p>
-            </motion.div>
-          ))}
+              <span className="text-[15px] text-white/70 font-light">Клубқа қатысу</span>
+              <span className="text-[16px] text-white font-semibold tracking-wide">ТЕГІН ✦</span>
+            </a>
+          </motion.div>
         </div>
-
-        {/* Free badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-12 text-center"
-        >
-          <a
-            href="#join"
-            className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 rounded-full shadow-lg shadow-gray-900/20 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <span className="text-[13px] text-white/70 font-light">Клубқа қатысу</span>
-            <span className="text-[14px] text-white font-semibold tracking-wide">ТЕГІН ✦</span>
-          </a>
-        </motion.div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
