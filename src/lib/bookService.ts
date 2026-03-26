@@ -10,6 +10,8 @@ import {
   onSnapshot,
   Timestamp,
   increment,
+  getDoc,
+  setDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -24,6 +26,7 @@ export interface Book {
   image: string;
   slug: string;
   addedAt: Timestamp;
+  likes: number;
 }
 
 const booksCol = collection(db, 'books');
@@ -32,9 +35,10 @@ const booksCol = collection(db, 'books');
 export function subscribeBooks(callback: (books: Book[]) => void) {
   const q = query(booksCol, orderBy('addedAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    const books: Book[] = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+    const books: Book[] = snapshot.docs.map((d) => ({
+      id: d.id,
+      likes: 0,
+      ...d.data(),
     })) as Book[];
     callback(books);
   });
@@ -44,17 +48,19 @@ export function subscribeBooks(callback: (books: Book[]) => void) {
 export async function getBooks(): Promise<Book[]> {
   const q = query(booksCol, orderBy('addedAt', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
+  return snapshot.docs.map((d) => ({
+    id: d.id,
+    likes: 0,
+    ...d.data(),
   })) as Book[];
 }
 
 /** Жаңа кітап қосу */
-export async function addBook(book: Omit<Book, 'id' | 'addedAt'>) {
+export async function addBook(book: Omit<Book, 'id' | 'addedAt' | 'likes'>) {
   return addDoc(booksCol, {
     ...book,
     addedAt: Timestamp.now(),
+    likes: 0,
   });
 }
 
@@ -68,6 +74,18 @@ export async function deleteBook(bookId: string) {
   return deleteDoc(doc(db, 'books', bookId));
 }
 
+/** Кітапқа лайк */
+export async function likeBook(bookId: string) {
+  const bookRef = doc(db, 'books', bookId);
+  return updateDoc(bookRef, { likes: increment(1) });
+}
+
+/** Кітаптан лайкты алу */
+export async function unlikeBook(bookId: string) {
+  const bookRef = doc(db, 'books', bookId);
+  return updateDoc(bookRef, { likes: increment(-1) });
+}
+
 // ─── Пікірлер (comments) ───
 
 export interface Comment {
@@ -77,6 +95,8 @@ export interface Comment {
   text: string;
   createdAt: Timestamp;
   likes: number;
+  replyTo?: string;       // жауап берілген комментарий ID
+  replyToAuthor?: string; // жауап берілген адамның аты
 }
 
 /** Кітапқа пікірлер (realtime) */
@@ -87,9 +107,9 @@ export function subscribeComments(
   const commentsCol = collection(db, 'books', bookId, 'comments');
   const q = query(commentsCol, orderBy('createdAt', 'asc'));
   return onSnapshot(q, (snapshot) => {
-    const comments: Comment[] = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+    const comments: Comment[] = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
     })) as Comment[];
     callback(comments);
   });
@@ -98,7 +118,7 @@ export function subscribeComments(
 /** Жаңа пікір қосу */
 export async function addComment(
   bookId: string,
-  comment: { author: string; text: string }
+  comment: { author: string; text: string; replyTo?: string; replyToAuthor?: string }
 ) {
   const commentsCol = collection(db, 'books', bookId, 'comments');
   return addDoc(commentsCol, {
@@ -113,6 +133,12 @@ export async function addComment(
 export async function likeComment(bookId: string, commentId: string) {
   const commentRef = doc(db, 'books', bookId, 'comments', commentId);
   return updateDoc(commentRef, { likes: increment(1) });
+}
+
+/** Пікірден лайкты алу */
+export async function unlikeComment(bookId: string, commentId: string) {
+  const commentRef = doc(db, 'books', bookId, 'comments', commentId);
+  return updateDoc(commentRef, { likes: increment(-1) });
 }
 
 /** Пікірді жою */

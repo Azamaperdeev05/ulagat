@@ -73,7 +73,7 @@ export default function Navbar() {
             </a>
           ))}
           <Link
-            to="/#join"
+            to="/apply"
             className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all duration-300 hover:shadow-lg ${
               isScrolled 
                 ? 'bg-gray-900 text-white hover:bg-gray-800' 
@@ -118,7 +118,7 @@ export default function Navbar() {
                 </a>
               ))}
               <Link
-                to="/#join"
+                to="/apply"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="mt-3 px-5 py-3 bg-gray-900 text-white text-center text-[13px] font-medium rounded-full hover:bg-gray-800 transition-all"
               >

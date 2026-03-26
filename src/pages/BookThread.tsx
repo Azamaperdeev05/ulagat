@@ -10,12 +10,17 @@ import {
   Send,
   Check,
   Loader2,
+  Reply,
+  X,
 } from 'lucide-react';
 import {
   subscribeBooks,
   subscribeComments,
   addComment,
   likeComment,
+  unlikeComment,
+  likeBook,
+  unlikeBook,
   type Book,
   type Comment as FBComment,
 } from '../lib/bookService';
@@ -29,10 +34,12 @@ export default function BookThread() {
   const [newComment, setNewComment] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [replyTo, setReplyTo] = useState<{ id: string; author: string } | null>(null);
+  const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
+  const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   // Кітаптарды Firestore-дан іздеу
   useEffect(() => {
@@ -53,21 +60,26 @@ export default function BookThread() {
     return () => unsubscribe();
   }, [book]);
 
-  // localStorage-дан аты-жөнді қалпына келтіру
+  // localStorage-дан аты мен лайктарды қалпына келтіру
   useEffect(() => {
     const savedName = localStorage.getItem('ulagat-username');
     if (savedName) setAuthorName(savedName);
     if (slug) {
       setLiked(localStorage.getItem(`ulagat-like-${slug}`) === 'true');
-      const c = localStorage.getItem(`ulagat-likecount-${slug}`);
-      setLikeCount(c ? parseInt(c, 10) : 0);
+      // Лайк қойылған комментарийлерді қалпына келтіру
+      const savedCommentLikes = localStorage.getItem(`ulagat-comment-likes-${slug}`);
+      if (savedCommentLikes) {
+        try {
+          setLikedComments(new Set(JSON.parse(savedCommentLikes)));
+        } catch { /* ignore */ }
+      }
     }
   }, [slug]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
-        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+        <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
         <span className="ml-3 text-gray-400">Жүктелуде...</span>
       </div>
     );
@@ -78,7 +90,7 @@ export default function BookThread() {
       <div className="min-h-screen flex items-center justify-center pt-20">
         <div className="text-center">
           <p className="text-gray-400 text-lg mb-4">Кітап табылмады</p>
-          <Link to="/#books" className="text-accent hover:underline text-sm">
+          <Link to="/#books" className="text-amber-500 hover:underline text-sm">
             ← Кітаптарға оралу
           </Link>
         </div>
@@ -86,22 +98,49 @@ export default function BookThread() {
     );
   }
 
-  const handleLike = () => {
+  const handleLike = async () => {
+    if (!book) return;
     const newLiked = !liked;
-    const newCount = newLiked ? likeCount + 1 : likeCount - 1;
     setLiked(newLiked);
-    setLikeCount(newCount);
     localStorage.setItem(`ulagat-like-${slug}`, String(newLiked));
-    localStorage.setItem(`ulagat-likecount-${slug}`, String(newCount));
+    try {
+      if (newLiked) {
+        await likeBook(book.id);
+      } else {
+        await unlikeBook(book.id);
+      }
+    } catch (err) {
+      // Revert on error
+      setLiked(!newLiked);
+      localStorage.setItem(`ulagat-like-${slug}`, String(!newLiked));
+    }
   };
 
   const handleCommentLike = async (commentId: string) => {
     if (!book) return;
-    try {
-      await likeComment(book.id, commentId);
-    } catch (err) {
-      console.error('Лайк қатесі:', err);
+    const isLiked = likedComments.has(commentId);
+    const newSet = new Set(likedComments);
+    
+    if (isLiked) {
+      newSet.delete(commentId);
+      setLikedComments(newSet);
+      localStorage.setItem(`ulagat-comment-likes-${slug}`, JSON.stringify([...newSet]));
+      try {
+        await unlikeComment(book.id, commentId);
+      } catch { /* revert */ }
+    } else {
+      newSet.add(commentId);
+      setLikedComments(newSet);
+      localStorage.setItem(`ulagat-comment-likes-${slug}`, JSON.stringify([...newSet]));
+      try {
+        await likeComment(book.id, commentId);
+      } catch { /* revert */ }
     }
+  };
+
+  const handleReply = (commentId: string, author: string) => {
+    setReplyTo({ id: commentId, author });
+    commentInputRef.current?.focus();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,9 +152,11 @@ export default function BookThread() {
       await addComment(book.id, {
         author: authorName.trim(),
         text: newComment.trim(),
+        ...(replyTo ? { replyTo: replyTo.id, replyToAuthor: replyTo.author } : {}),
       });
       localStorage.setItem('ulagat-username', authorName.trim());
       setNewComment('');
+      setReplyTo(null);
       setTimeout(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -127,7 +168,7 @@ export default function BookThread() {
   };
 
   const handleShare = async () => {
-    const url = window.location.href;
+    const url = `https://ulagat-krg.vercel.app/books/${slug}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -179,13 +220,15 @@ export default function BookThread() {
     const diffMs = now.getTime() - date.getTime();
     const diffMin = Math.floor(diffMs / 60000);
     if (diffMin < 1) return 'Жаңа ғана';
-    if (diffMin < 60) return `${diffMin} мин бұрын`;
+    if (diffMin < 60) return `${diffMin} мин`;
     const diffHours = Math.floor(diffMin / 60);
-    if (diffHours < 24) return `${diffHours} сағ бұрын`;
+    if (diffHours < 24) return `${diffHours} сағ`;
     const diffDays = Math.floor(diffHours / 24);
-    if (diffDays < 7) return `${diffDays} күн бұрын`;
+    if (diffDays < 7) return `${diffDays} к`;
     return date.toLocaleDateString('kk-KZ');
   };
+
+  const likeCount = book.likes || 0;
 
   return (
     <>
@@ -215,7 +258,7 @@ export default function BookThread() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[14px] font-semibold text-gray-900">ulagat.club</span>
-                  <span className="w-4 h-4 bg-accent rounded-full flex items-center justify-center">
+                  <span className="w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center">
                     <Check className="w-2.5 h-2.5 text-white" />
                   </span>
                 </div>
@@ -251,30 +294,35 @@ export default function BookThread() {
                 onClick={handleLike}
                 className="flex items-center gap-1.5 group/btn transition-colors"
               >
-                <Heart
-                  className={`w-[22px] h-[22px] transition-all duration-200 ${
-                    liked
-                      ? 'text-red-500 fill-red-500 scale-110'
-                      : 'text-gray-400 group-hover/btn:text-red-400'
-                  }`}
-                />
+                <motion.div
+                  whileTap={{ scale: 1.3 }}
+                  transition={{ type: 'spring', stiffness: 400 }}
+                >
+                  <Heart
+                    className={`w-[22px] h-[22px] transition-all duration-200 ${
+                      liked
+                        ? 'text-red-500 fill-red-500'
+                        : 'text-gray-400 group-hover/btn:text-red-400'
+                    }`}
+                  />
+                </motion.div>
                 {likeCount > 0 && (
-                  <span className={`text-[13px] ${liked ? 'text-red-500' : 'text-gray-400'}`}>
+                  <span className={`text-[13px] font-medium ${liked ? 'text-red-500' : 'text-gray-400'}`}>
                     {likeCount}
                   </span>
                 )}
               </button>
 
-              <button className="flex items-center gap-1.5 text-gray-400">
+              <button className="flex items-center gap-1.5 text-gray-400 hover:text-blue-400 transition-colors">
                 <MessageCircle className="w-[22px] h-[22px]" />
                 {comments.length > 0 && (
-                  <span className="text-[13px] text-gray-400">{comments.length}</span>
+                  <span className="text-[13px] font-medium text-gray-400">{comments.length}</span>
                 )}
               </button>
 
               <button
                 onClick={handleShare}
-                className="flex items-center gap-1.5 text-gray-400 hover:text-accent transition-colors relative"
+                className="flex items-center gap-1.5 text-gray-400 hover:text-amber-500 transition-colors relative"
               >
                 <Share2 className="w-[20px] h-[20px]" />
                 <AnimatePresence>
@@ -302,64 +350,113 @@ export default function BookThread() {
           {/* ─── Comments section (Threads-style) ─── */}
           {comments.length > 0 && (
             <div className="space-y-0">
-              {comments.map((comment, i) => (
-                <motion.div
-                  key={comment.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                  className="bg-white border border-gray-200/80 first:rounded-t-2xl last:rounded-b-2xl border-t-0 first:border-t"
-                >
-                  <div className="p-4 sm:p-5 flex gap-3">
-                    {/* Avatar */}
-                    <div
-                      className={`shrink-0 w-9 h-9 rounded-full ${getAvatarColor(
-                        comment.author
-                      )} flex items-center justify-center shadow-sm`}
-                    >
-                      <span className="text-white text-[11px] font-bold">
-                        {getInitials(comment.author)}
-                      </span>
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[13px] font-semibold text-gray-900">
-                          {comment.author}
+              {comments.map((comment, i) => {
+                const isCommentLiked = likedComments.has(comment.id);
+                return (
+                  <motion.div
+                    key={comment.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    className="bg-white border border-gray-200/80 first:rounded-t-2xl last:rounded-b-2xl border-t-0 first:border-t"
+                  >
+                    <div className="p-4 sm:p-5 flex gap-3">
+                      {/* Avatar */}
+                      <div
+                        className={`shrink-0 w-9 h-9 rounded-full ${getAvatarColor(
+                          comment.author
+                        )} flex items-center justify-center shadow-sm`}
+                      >
+                        <span className="text-white text-[11px] font-bold">
+                          {getInitials(comment.author)}
                         </span>
-                        <span className="text-[11px] text-gray-400">{formatTime(comment)}</span>
                       </div>
-                      <p className="text-[14px] text-gray-700 font-light leading-relaxed whitespace-pre-wrap">
-                        {comment.text}
-                      </p>
 
-                      {/* Comment actions */}
-                      <div className="flex items-center gap-5 mt-2.5">
-                        <button
-                          onClick={() => handleCommentLike(comment.id)}
-                          className="flex items-center gap-1 transition-colors"
-                        >
-                          <Heart
-                            className="w-3.5 h-3.5 text-gray-400 hover:text-red-400 transition-all"
-                          />
-                          {comment.likes > 0 && (
-                            <span className="text-[11px] text-gray-400">
-                              {comment.likes}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[13px] font-semibold text-gray-900">
+                            {comment.author}
+                          </span>
+                          <span className="text-[11px] text-gray-400">{formatTime(comment)}</span>
+                        </div>
+
+                        {/* Reply indicator */}
+                        {comment.replyToAuthor && (
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <Reply className="w-3 h-3 text-blue-400 rotate-180" />
+                            <span className="text-[12px] text-blue-500 font-medium">
+                              @{comment.replyToAuthor}
                             </span>
-                          )}
-                        </button>
-                        <button className="flex items-center gap-1 text-gray-400 hover:text-blue-400 transition-colors">
-                          <MessageCircle className="w-3.5 h-3.5" />
-                        </button>
+                          </div>
+                        )}
+
+                        <p className="text-[14px] text-gray-700 font-light leading-relaxed whitespace-pre-wrap">
+                          {comment.text}
+                        </p>
+
+                        {/* Comment actions */}
+                        <div className="flex items-center gap-5 mt-2.5">
+                          <button
+                            onClick={() => handleCommentLike(comment.id)}
+                            className="flex items-center gap-1 transition-colors group/like"
+                          >
+                            <motion.div
+                              whileTap={{ scale: 1.4 }}
+                              transition={{ type: 'spring', stiffness: 400 }}
+                            >
+                              <Heart
+                                className={`w-3.5 h-3.5 transition-all ${
+                                  isCommentLiked
+                                    ? 'text-red-500 fill-red-500'
+                                    : 'text-gray-400 group-hover/like:text-red-400'
+                                }`}
+                              />
+                            </motion.div>
+                            {comment.likes > 0 && (
+                              <span className={`text-[11px] ${isCommentLiked ? 'text-red-500' : 'text-gray-400'}`}>
+                                {comment.likes}
+                              </span>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleReply(comment.id, comment.author)}
+                            className="flex items-center gap-1.5 text-gray-400 hover:text-blue-400 transition-colors"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span className="text-[11px]">Жауап</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           )}
 
           <div ref={bottomRef} />
+
+          {/* ─── Reply indicator ─── */}
+          <AnimatePresence>
+            {replyTo && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-3 mx-1 flex items-center gap-2 text-[13px] text-blue-500"
+              >
+                <Reply className="w-3.5 h-3.5 rotate-180" />
+                <span className="font-medium">@{replyTo.author}</span>
+                <span className="text-gray-400">адамына жауап</span>
+                <button
+                  onClick={() => setReplyTo(null)}
+                  className="ml-auto text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ─── New comment input ─── */}
           <motion.form
@@ -367,7 +464,7 @@ export default function BookThread() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
             onSubmit={handleSubmit}
-            className="mt-4 bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm"
+            className="mt-3 bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm"
           >
             {/* Author name input */}
             {!localStorage.getItem('ulagat-username') && (
@@ -396,9 +493,10 @@ export default function BookThread() {
               </div>
               <div className="flex-1">
                 <textarea
+                  ref={commentInputRef}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Ой-пікіріңізді жазыңыз..."
+                  placeholder={replyTo ? `@${replyTo.author} адамына жауап...` : 'Ой-пікіріңізді жазыңыз...'}
                   rows={2}
                   className="w-full bg-transparent text-[14px] text-gray-900 placeholder-gray-400 outline-none resize-none leading-relaxed"
                 />
@@ -416,7 +514,7 @@ export default function BookThread() {
                 ) : (
                   <Send className="w-3.5 h-3.5" />
                 )}
-                Жіберу
+                {replyTo ? 'Жауап' : 'Жіберу'}
               </button>
             </div>
           </motion.form>

@@ -1,7 +1,7 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { ArrowLeft, Music, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useRef } from 'react';
 import Footer from '../components/Footer';
 
 interface Member {
@@ -72,52 +72,147 @@ function getLastName(fullName: string) {
   return fullName.split(' ')[0];
 }
 
-function MemberCard({ member, index }: { member: Member; index: number }) {
+/* ── 3D tilt card effect ── */
+function TiltCard({ children, className = '' }: React.PropsWithChildren<{ className?: string }>) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const springRotateX = useSpring(rotateX, { stiffness: 200, damping: 25 });
+  const springRotateY = useSpring(rotateY, { stiffness: 200, damping: 25 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    rotateX.set(y * -15);
+    rotateY.set(x * 15);
+  };
+
+  const handleMouseLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
+      ref={ref}
+      style={{
+        rotateX: springRotateX,
+        rotateY: springRotateY,
+        transformPerspective: 800,
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function MemberCard({ member, index, ...rest }: { member: Member; index: number; [key: string]: any }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50, rotateX: 15 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
       transition={{
-        duration: 0.7,
-        delay: index * 0.05,
+        duration: 0.8,
+        delay: index * 0.06,
         ease: [0.16, 1, 0.3, 1],
       }}
       className="group"
+      style={{ transformPerspective: 1000 }}
     >
-      <div className="relative rounded-[28px] overflow-hidden transition-all duration-700 hover:scale-[1.03]">
-        {/* Gradient background */}
-        <div className="aspect-[3/4] relative overflow-hidden">
-          <div className={`absolute inset-0 bg-gradient-to-br ${getGradient(member)}`} />
+      <TiltCard className="">
+        <div className="relative rounded-[28px] overflow-hidden cursor-default">
+          {/* Gradient background */}
+          <div className="aspect-3/4 relative overflow-hidden">
+            <div className={`absolute inset-0 bg-linear-to-br ${getGradient(member)}`} />
 
-          {/* Glass circle with initials */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative">
-              {/* Glow ring */}
-              <div className="absolute inset-[-8px] rounded-full bg-white/10 blur-xl group-hover:bg-white/20 transition-all duration-700" />
-              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/25 group-hover:bg-white/25 transition-all duration-500">
-                <span className="text-white text-3xl sm:text-4xl font-display font-bold tracking-tight drop-shadow-lg">
-                  {getInitials(member.name)}
-                </span>
+            {/* Animated shimmer */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
+              initial={{ x: '-100%' }}
+              whileHover={{ x: '200%' }}
+              transition={{ duration: 0.8, ease: 'easeInOut' }}
+            />
+
+            {/* Glass circle */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative">
+                {/* Pulse glow */}
+                <motion.div
+                  className="absolute inset-[-12px] rounded-full bg-white/10 blur-xl"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.div
+                  className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/25"
+                  whileHover={{ scale: 1.15, borderColor: 'rgba(255,255,255,0.5)' }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <span className="text-white text-3xl sm:text-4xl font-display font-bold tracking-tight drop-shadow-lg">
+                    {getInitials(member.name)}
+                  </span>
+                </motion.div>
               </div>
             </div>
-          </div>
 
-          {/* Bottom fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+            {/* Bottom fade */}
+            <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
 
-          {/* Name overlay on image */}
-          <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-            <p className="text-[18px] sm:text-[20px] font-display font-semibold text-white tracking-tight leading-tight drop-shadow-lg">
-              {getFirstName(member.name)}
-            </p>
-            <p className="text-[13px] text-white/60 font-medium mt-0.5 drop-shadow">
-              {getLastName(member.name)}
-            </p>
+            {/* Name — slides up on hover */}
+            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+              <motion.p
+                className="text-[18px] sm:text-[20px] font-display font-semibold text-white tracking-tight leading-tight drop-shadow-lg"
+                initial={false}
+                whileHover={{ y: -4 }}
+              >
+                {getFirstName(member.name)}
+              </motion.p>
+              <p className="text-[13px] text-white/60 font-medium mt-0.5 drop-shadow">
+                {getLastName(member.name)}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </TiltCard>
     </motion.div>
+  );
+}
+
+/* ── Floating musical notes ── */
+function FloatingNotes() {
+  const notes = ['♪', '♫', '♩', '♬', '𝄞'];
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {notes.map((note, i) => (
+        <motion.div
+          key={i}
+          className="absolute text-white/3 font-serif select-none"
+          style={{
+            fontSize: `${40 + i * 20}px`,
+            left: `${10 + i * 18}%`,
+            top: `${15 + Math.sin(i * 2) * 25}%`,
+          }}
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, 10, -10, 0],
+            opacity: [0.03, 0.06, 0.03],
+          }}
+          transition={{
+            duration: 6 + i,
+            repeat: Infinity,
+            delay: i * 1.2,
+            ease: 'easeInOut',
+          }}
+        >
+          {note}
+        </motion.div>
+      ))}
+    </div>
   );
 }
 
@@ -127,8 +222,9 @@ export default function Ensemble() {
     target: heroRef,
     offset: ['start start', 'end start'],
   });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
 
   const femaleMembers = members.filter((m) => m.gender === 'female');
   const maleMembers = members.filter((m) => m.gender === 'male');
@@ -136,17 +232,33 @@ export default function Ensemble() {
   return (
     <>
       <div className="min-h-screen bg-[#000000]">
-        {/* ─── Hero — Apple dark cinematic ─── */}
+        {/* ─── Hero — Cinematic fullscreen ─── */}
         <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
-          {/* Ambient glows */}
+          {/* Animated ambient glows */}
           <div className="absolute inset-0">
-            <div className="absolute top-[20%] left-[20%] w-[500px] h-[500px] rounded-full bg-amber-500/8 blur-[150px]" />
-            <div className="absolute bottom-[20%] right-[20%] w-[400px] h-[400px] rounded-full bg-orange-500/6 blur-[120px]" />
+            <motion.div
+              className="absolute top-[20%] left-[20%] w-[500px] h-[500px] rounded-full bg-amber-500/8 blur-[150px]"
+              animate={{ scale: [1, 1.2, 1], x: [0, 30, 0] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="absolute bottom-[20%] right-[20%] w-[400px] h-[400px] rounded-full bg-orange-500/6 blur-[120px]"
+              animate={{ scale: [1, 1.15, 1], y: [0, -20, 0] }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+            />
             <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full bg-amber-400/4 blur-[200px]" />
           </div>
 
+          {/* Floating notes */}
+          <FloatingNotes />
+
           {/* Back link */}
-          <div className="absolute top-0 left-0 right-0 pt-24 px-6 z-20">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+            className="absolute top-0 left-0 right-0 pt-24 px-6 z-20"
+          >
             <div className="max-w-[980px] mx-auto">
               <Link
                 to="/"
@@ -156,90 +268,116 @@ export default function Ensemble() {
                 Басты бетке
               </Link>
             </div>
-          </div>
+          </motion.div>
 
-          <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 text-center px-6 pt-20">
+          <motion.div
+            style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+            className="relative z-10 text-center px-6 pt-20"
+          >
+            {/* Animated eyebrow — letter spacing expands */}
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="text-[13px] font-semibold tracking-[0.3em] uppercase text-amber-400/70 mb-8"
+              initial={{ opacity: 0, letterSpacing: '0.1em' }}
+              animate={{ opacity: 1, letterSpacing: '0.3em' }}
+              transition={{ duration: 1.5, delay: 0.2 }}
+              className="text-[13px] font-semibold uppercase text-amber-400/70 mb-8"
             >
               Музыка · Өнер · Рух
             </motion.p>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[48px] sm:text-[64px] md:text-[80px] lg:text-[96px] font-display font-bold text-white leading-[0.95] tracking-[-0.03em]"
-            >
-              Ұлағат
-              <br />
-              <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-red-400 bg-clip-text text-transparent">
+            {/* Staggered title reveal */}
+            <div className="overflow-hidden mb-4">
+              <motion.h1
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="text-[48px] sm:text-[64px] md:text-[80px] lg:text-[96px] font-display font-bold text-white leading-[0.95] tracking-[-0.03em]"
+              >
+                Ұлағат
+              </motion.h1>
+            </div>
+            <div className="overflow-hidden">
+              <motion.h1
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="text-[48px] sm:text-[64px] md:text-[80px] lg:text-[96px] font-display font-bold leading-[0.95] tracking-[-0.03em] bg-gradient-to-r from-amber-300 via-orange-400 to-red-400 bg-clip-text text-transparent"
+              >
                 үні.
-              </span>
-            </motion.h1>
+              </motion.h1>
+            </div>
 
+            {/* Subtitle with blur-in */}
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="text-[19px] sm:text-[21px] text-gray-400 font-light leading-[1.5] max-w-xl mx-auto mt-8"
+              initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
+              animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+              transition={{ duration: 1, delay: 0.9 }}
+              className="text-[19px] sm:text-[21px] text-gray-400 font-light leading-normal max-w-xl mx-auto mt-8"
             >
               Оқырман клубы мүшелері ішіндегі өнерлі жандардан
               құрылған ансамбль.
             </motion.p>
 
-            {/* Stats */}
+            {/* Stats with count-up */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.9 }}
+              transition={{ duration: 0.8, delay: 1.2 }}
               className="flex items-center justify-center gap-12 sm:gap-16 mt-14"
             >
               {[
                 { value: '20+', label: 'Мүше' },
                 { value: '15.03', label: 'Алғашқы күй кеші' },
                 { value: '15', label: 'Өнерпаз' },
-              ].map((stat, i) => (
-                <div key={stat.label} className="text-center">
+              ].map((stat) => (
+                <motion.div
+                  key={stat.label}
+                  className="text-center"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
                   <p className="text-[36px] sm:text-[48px] font-display font-bold text-white tracking-tight leading-none">
                     {stat.value}
                   </p>
                   <p className="text-[11px] text-gray-600 font-medium mt-2 tracking-widest uppercase">
                     {stat.label}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           </motion.div>
 
-          {/* Scroll indicator */}
+          {/* Scroll indicator with pulse */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
+            transition={{ delay: 2 }}
             className="absolute bottom-10 left-1/2 -translate-x-1/2"
           >
-            <div className="w-6 h-10 rounded-full border-2 border-gray-700 flex items-start justify-center p-1.5">
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-1.5 h-1.5 rounded-full bg-gray-500"
-              />
-            </div>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              className="flex flex-col items-center gap-2"
+            >
+              <span className="text-[11px] text-gray-600 tracking-widest uppercase">Scroll</span>
+              <div className="w-6 h-10 rounded-full border-2 border-gray-700 flex items-start justify-center p-1.5">
+                <motion.div
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-1.5 h-1.5 rounded-full bg-amber-400"
+                />
+              </div>
+            </motion.div>
           </motion.div>
         </section>
 
-        {/* ─── About — Apple white section ─── */}
-        <section className="py-28 lg:py-40 bg-[#fafafa]">
+        {/* ─── About section ─── */}
+        <section className="py-28 lg:py-40 bg-gray-50">
           <div className="max-w-[780px] mx-auto px-6 text-center">
             <motion.h2
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
               className="text-[32px] sm:text-[40px] md:text-[48px] font-display font-semibold text-gray-900 leading-[1.1] tracking-[-0.02em] mb-8"
             >
               Домбыра мен күй өнерін жаңғыртып, рухани мұраны жас ұрпаққа
@@ -247,7 +385,7 @@ export default function Ensemble() {
             </motion.h2>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -268,19 +406,25 @@ export default function Ensemble() {
           </div>
         </section>
 
-        {/* ─── Members: Қыздар — Apple grid ─── */}
+        {/* ─── Female members ─── */}
         <section className="py-24 lg:py-32 bg-white">
           <div className="max-w-[1200px] mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="text-center mb-16"
             >
-              <p className="text-[13px] font-semibold tracking-[0.25em] uppercase text-rose-400 mb-4">
+              <motion.p
+                initial={{ opacity: 0, letterSpacing: '0.1em' }}
+                whileInView={{ opacity: 1, letterSpacing: '0.25em' }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="text-[13px] font-semibold uppercase text-rose-400 mb-4"
+              >
                 Қыздар
-              </p>
+              </motion.p>
               <h3 className="text-[36px] sm:text-[44px] md:text-[52px] font-display font-semibold text-gray-900 tracking-[-0.02em] leading-none">
                 Әйел өнерпаздар.
               </h3>
@@ -294,19 +438,26 @@ export default function Ensemble() {
           </div>
         </section>
 
-        {/* ─── Members: Ұлдар — Apple dark grid ─── */}
-        <section className="py-24 lg:py-32 bg-[#1d1d1f]">
-          <div className="max-w-[1200px] mx-auto px-6">
+        {/* ─── Male members — dark section ─── */}
+        <section className="relative py-24 lg:py-32 bg-gray-900 overflow-hidden">
+          <FloatingNotes />
+          <div className="relative max-w-[1200px] mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="text-center mb-16"
             >
-              <p className="text-[13px] font-semibold tracking-[0.25em] uppercase text-blue-400 mb-4">
+              <motion.p
+                initial={{ opacity: 0, letterSpacing: '0.1em' }}
+                whileInView={{ opacity: 1, letterSpacing: '0.25em' }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="text-[13px] font-semibold uppercase text-blue-400 mb-4"
+              >
                 Ұлдар
-              </p>
+              </motion.p>
               <h3 className="text-[36px] sm:text-[44px] md:text-[52px] font-display font-semibold text-white tracking-[-0.02em] leading-none">
                 Ер өнерпаздар.
               </h3>
@@ -320,14 +471,14 @@ export default function Ensemble() {
           </div>
         </section>
 
-        {/* ─── CTA — Apple style ─── */}
+        {/* ─── CTA ─── */}
         <section className="py-28 lg:py-36 bg-white">
           <div className="max-w-[780px] mx-auto px-6 text-center">
             <motion.div
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
               <h3 className="text-[32px] sm:text-[40px] md:text-[48px] font-display font-semibold text-gray-900 tracking-[-0.02em] leading-[1.1] mb-6">
                 Сен де қосыл.
@@ -340,7 +491,12 @@ export default function Ensemble() {
                 className="group inline-flex items-center gap-2.5 text-[17px] text-amber-500 font-medium hover:text-amber-600 transition-colors"
               >
                 Өтінім қалдыру
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                <motion.span
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <ArrowRight className="w-5 h-5" />
+                </motion.span>
               </Link>
             </motion.div>
           </div>
