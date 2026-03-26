@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Кітаптар — барлығы оқи алады, тек admin жаза алады (болашақта)
+    match /books/{bookId} {
+      allow read: if true;
+      allow write: if true; // Уақытша ашық, кейін admin auth қосамыз
+      
+      // Пікірлер — барлығы оқи алады, кез-келген кіруші жаза алады
+      match /comments/{commentId} {
+        allow read: if true;
+        allow write: if true;
+      }
+    }
+  }
+}

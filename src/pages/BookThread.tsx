@@ -9,60 +9,69 @@ import {
   BookOpen,
   Send,
   Check,
+  Loader2,
 } from 'lucide-react';
-import { booksData } from '../components/Books';
+import {
+  subscribeBooks,
+  subscribeComments,
+  addComment,
+  likeComment,
+  type Book,
+  type Comment as FBComment,
+} from '../lib/bookService';
 import Footer from '../components/Footer';
-
-interface Comment {
-  id: string;
-  author: string;
-  text: string;
-  time: string;
-  likes: number;
-  likedByMe: boolean;
-}
-
-function getStoredComments(slug: string): Comment[] {
-  try {
-    const stored = localStorage.getItem(`ulagat-comments-${slug}`);
-    if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
-  return [];
-}
-
-function saveComments(slug: string, comments: Comment[]) {
-  localStorage.setItem(`ulagat-comments-${slug}`, JSON.stringify(comments));
-}
-
-function getStoredLike(slug: string): boolean {
-  return localStorage.getItem(`ulagat-like-${slug}`) === 'true';
-}
-
-function getStoredLikeCount(slug: string): number {
-  const c = localStorage.getItem(`ulagat-likecount-${slug}`);
-  return c ? parseInt(c, 10) : 0;
-}
 
 export default function BookThread() {
   const { slug } = useParams<{ slug: string }>();
-  const book = booksData.find((b) => b.slug === slug);
-
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [book, setBook] = useState<Book | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState<FBComment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Кітаптарды Firestore-дан іздеу
   useEffect(() => {
-    if (!slug) return;
-    setComments(getStoredComments(slug));
-    setLiked(getStoredLike(slug));
-    setLikeCount(getStoredLikeCount(slug));
+    const unsubscribe = subscribeBooks((books) => {
+      const found = books.find((b) => b.slug === slug);
+      setBook(found || null);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [slug]);
+
+  // Кітап табылғанда пікірлерді жүктеу
+  useEffect(() => {
+    if (!book) return;
+    const unsubscribe = subscribeComments(book.id, (fbComments) => {
+      setComments(fbComments);
+    });
+    return () => unsubscribe();
+  }, [book]);
+
+  // localStorage-дан аты-жөнді қалпына келтіру
+  useEffect(() => {
     const savedName = localStorage.getItem('ulagat-username');
     if (savedName) setAuthorName(savedName);
+    if (slug) {
+      setLiked(localStorage.getItem(`ulagat-like-${slug}`) === 'true');
+      const c = localStorage.getItem(`ulagat-likecount-${slug}`);
+      setLikeCount(c ? parseInt(c, 10) : 0);
+    }
   }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+        <span className="ml-3 text-gray-400">Жүктелуде...</span>
+      </div>
+    );
+  }
 
   if (!book) {
     return (
@@ -86,43 +95,35 @@ export default function BookThread() {
     localStorage.setItem(`ulagat-likecount-${slug}`, String(newCount));
   };
 
-  const handleCommentLike = (commentId: string) => {
-    const updated = comments.map((c) => {
-      if (c.id === commentId) {
-        return {
-          ...c,
-          likedByMe: !c.likedByMe,
-          likes: c.likedByMe ? c.likes - 1 : c.likes + 1,
-        };
-      }
-      return c;
-    });
-    setComments(updated);
-    saveComments(slug!, updated);
+  const handleCommentLike = async (commentId: string) => {
+    if (!book) return;
+    try {
+      await likeComment(book.id, commentId);
+    } catch (err) {
+      console.error('Лайк қатесі:', err);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || !authorName.trim()) return;
+    if (!newComment.trim() || !authorName.trim() || !book) return;
 
-    const comment: Comment = {
-      id: Date.now().toString(),
-      author: authorName.trim(),
-      text: newComment.trim(),
-      time: 'Жаңа ғана',
-      likes: 0,
-      likedByMe: false,
-    };
-
-    const updated = [...comments, comment];
-    setComments(updated);
-    saveComments(slug!, updated);
-    localStorage.setItem('ulagat-username', authorName.trim());
-    setNewComment('');
-
-    setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    setSubmitting(true);
+    try {
+      await addComment(book.id, {
+        author: authorName.trim(),
+        text: newComment.trim(),
+      });
+      localStorage.setItem('ulagat-username', authorName.trim());
+      setNewComment('');
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } catch (err) {
+      console.error('Пікір қосу қатесі:', err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleShare = async () => {
@@ -132,7 +133,6 @@ export default function BookThread() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback
       const input = document.createElement('input');
       input.value = url;
       document.body.appendChild(input);
@@ -170,6 +170,21 @@ export default function BookThread() {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
     return avatarColors[Math.abs(hash) % avatarColors.length];
+  };
+
+  const formatTime = (comment: FBComment) => {
+    if (!comment.createdAt) return 'Жаңа ғана';
+    const date = comment.createdAt.toDate();
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'Жаңа ғана';
+    if (diffMin < 60) return `${diffMin} мин бұрын`;
+    const diffHours = Math.floor(diffMin / 60);
+    if (diffHours < 24) return `${diffHours} сағ бұрын`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return `${diffDays} күн бұрын`;
+    return date.toLocaleDateString('kk-KZ');
   };
 
   return (
@@ -218,7 +233,7 @@ export default function BookThread() {
               </p>
             </div>
 
-            {/* Book cover image — 9:16 */}
+            {/* Book cover image */}
             <div className="mx-5 mb-4 rounded-xl overflow-hidden border border-gray-100">
               <div className="relative aspect-9/14 sm:aspect-9/16 max-h-[400px] sm:max-h-[500px] bg-gray-100">
                 <img
@@ -312,7 +327,7 @@ export default function BookThread() {
                         <span className="text-[13px] font-semibold text-gray-900">
                           {comment.author}
                         </span>
-                        <span className="text-[11px] text-gray-400">{comment.time}</span>
+                        <span className="text-[11px] text-gray-400">{formatTime(comment)}</span>
                       </div>
                       <p className="text-[14px] text-gray-700 font-light leading-relaxed whitespace-pre-wrap">
                         {comment.text}
@@ -325,18 +340,10 @@ export default function BookThread() {
                           className="flex items-center gap-1 transition-colors"
                         >
                           <Heart
-                            className={`w-3.5 h-3.5 transition-all ${
-                              comment.likedByMe
-                                ? 'text-red-500 fill-red-500'
-                                : 'text-gray-400 hover:text-red-400'
-                            }`}
+                            className="w-3.5 h-3.5 text-gray-400 hover:text-red-400 transition-all"
                           />
                           {comment.likes > 0 && (
-                            <span
-                              className={`text-[11px] ${
-                                comment.likedByMe ? 'text-red-500' : 'text-gray-400'
-                              }`}
-                            >
+                            <span className="text-[11px] text-gray-400">
                               {comment.likes}
                             </span>
                           )}
@@ -401,10 +408,14 @@ export default function BookThread() {
             <div className="px-4 pb-3 flex justify-end">
               <button
                 type="submit"
-                disabled={!newComment.trim() || !authorName.trim()}
+                disabled={!newComment.trim() || !authorName.trim() || submitting}
                 className="flex items-center gap-2 px-5 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-full hover:bg-gray-800 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
               >
-                <Send className="w-3.5 h-3.5" />
+                {submitting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Send className="w-3.5 h-3.5" />
+                )}
                 Жіберу
               </button>
             </div>
@@ -412,7 +423,7 @@ export default function BookThread() {
 
           {/* Hint */}
           <p className="text-center text-[11px] text-gray-400 mt-4 font-light">
-            Пікірлер тек сіздің құрылғыңызда сақталады
+            Пікірлер Firebase Firestore-да сақталады — барлық оқырмандар көре алады ✨
           </p>
         </div>
       </div>

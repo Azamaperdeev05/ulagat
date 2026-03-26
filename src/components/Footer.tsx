@@ -81,13 +81,13 @@ export default function Footer() {
         {/* Developer credit */}
         <div className="pt-4 text-center">
           <a
-            href="https://sitqur.kz"
+            href="https://sitequr.kz"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-[11px] text-gray-600 hover:text-white transition-colors"
           >
             <span className="text-gray-600">Сайт жасаушы —</span>
-            <span className="font-medium">sitqur.kz</span>
+            <span className="font-medium">sitequr.kz</span>
           </a>
         </div>
       </div>
