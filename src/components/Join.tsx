@@ -64,8 +64,8 @@ export default function Join() {
                 <input type="tel" id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="+7 700 000 0000" />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="book" className="text-[12px] font-medium text-gray-400">Сүйікті кітабыңыз</label>
-                <input type="text" id="book" value={book} onChange={(e) => setBook(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Абай жолы" />
+                <label htmlFor="book" className="text-[12px] font-medium text-gray-400">Соңғы оқыған кітабыңыз</label>
+                <input type="text" id="book" value={book} onChange={(e) => setBook(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Абай жолы (немесе оқымадым)" />
               </div>
               <button type="button" onClick={handleSubmit} className="w-full mt-2 px-6 py-3.5 bg-accent text-white font-medium rounded-xl hover:bg-accent-hover transition-colors text-[14px]">
                 WhatsApp-қа жіберу

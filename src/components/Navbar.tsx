@@ -1,24 +1,38 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      if (isHomePage) {
+        setIsScrolled(window.scrollY > 20);
+      }
+    };
+    
+    if (!isHomePage) {
+      setIsScrolled(true);
+    } else {
+      setIsScrolled(window.scrollY > 20);
+    }
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isHomePage]);
 
   const navLinks = [
-    { name: 'Біз туралы', href: '#about' },
-    { name: 'Іс-шаралар', href: '#events' },
-    { name: 'Кітаптар', href: '#books' },
-    { name: 'Галерея', href: '#gallery' },
-    { name: 'Блог', href: '#blog' },
-    { name: 'Команда', href: '#team' },
+    { name: 'Біз туралы', href: '/#about' },
+    { name: 'Іс-шаралар', href: '/#events' },
+    { name: 'Кітаптар', href: '/#books' },
+    { name: 'Галерея', href: '/#gallery' },
+    { name: 'Блог', href: '/#blog' },
+    { name: 'Команда', href: '/#team' },
   ];
 
   return (
@@ -30,16 +44,20 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
-        <a href="#" className="flex items-center gap-2.5 group">
+        <Link to="/" className="flex items-center gap-2.5 group">
           <img
             src="/ulagat (1).svg"
             alt="ULAGAT Logo"
-            className="w-7 h-7 object-contain transition-transform duration-300 group-hover:scale-105"
+            className={`w-7 h-7 object-contain transition-transform duration-300 group-hover:scale-105 ${
+              !isScrolled ? 'brightness-0 invert' : ''
+            }`}
           />
-          <span className="font-display text-xl font-semibold tracking-tight text-gray-900">
+          <span className={`font-display text-xl font-semibold tracking-tight transition-colors duration-300 ${
+            isScrolled ? 'text-gray-900' : 'text-white'
+          }`}>
             ULAGAT
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
@@ -47,22 +65,30 @@ export default function Navbar() {
             <a
               key={link.name}
               href={link.href}
-              className="text-[13px] font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              className={`text-[13px] font-medium transition-colors duration-300 ${
+                isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white/80 hover:text-white'
+              }`}
             >
               {link.name}
             </a>
           ))}
-          <a
-            href="#join"
-            className="px-5 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-full hover:bg-gray-800 transition-all duration-200 hover:shadow-lg"
+          <Link
+            to="/#join"
+            className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all duration-300 hover:shadow-lg ${
+              isScrolled 
+                ? 'bg-gray-900 text-white hover:bg-gray-800' 
+                : 'bg-white text-gray-900 hover:bg-gray-100'
+            }`}
           >
             Қосылу
-          </a>
+          </Link>
         </div>
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden text-gray-900 p-1"
+          className={`md:hidden p-1 transition-colors duration-300 ${
+            isScrolled ? 'text-gray-900' : 'text-white'
+          }`}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle menu"
         >
@@ -91,13 +117,13 @@ export default function Navbar() {
                   {link.name}
                 </a>
               ))}
-              <a
-                href="#join"
+              <Link
+                to="/#join"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="mt-3 px-5 py-3 bg-gray-900 text-white text-center text-[13px] font-medium rounded-full hover:bg-gray-800 transition-all"
               >
                 Қосылу
-              </a>
+              </Link>
             </div>
           </motion.div>
         )}

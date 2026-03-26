@@ -1,4 +1,5 @@
 import { Instagram, Send, Mail, BookOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
@@ -72,8 +73,8 @@ export default function Footer() {
         <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[12px] text-gray-500">&copy; {new Date().getFullYear()} ULAGAT. Барлық құқықтар қорғалған.</p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-[12px] text-gray-500 hover:text-white transition-colors">Құпиялылық</a>
-            <a href="#" className="text-[12px] text-gray-500 hover:text-white transition-colors">Шарттар</a>
+            <Link to="/privacy" className="text-[12px] text-gray-500 hover:text-white transition-colors">Құпиялылық</Link>
+            <Link to="/terms" className="text-[12px] text-gray-500 hover:text-white transition-colors">Шарттар</Link>
           </div>
         </div>
       </div>
