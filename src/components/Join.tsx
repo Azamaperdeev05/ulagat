@@ -1,7 +1,18 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Instagram, Send } from 'lucide-react';
 
 export default function Join() {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [book, setBook] = useState('');
+
+  const handleSubmit = () => {
+    if (!name.trim()) return alert('Аты-жөніңізді жазыңыз');
+    const message = `🔖 ULAGAT клубына өтінім\n\n👤 Аты-жөні: ${name}\n📞 Телефон: ${phone}\n📚 Сүйікті кітабы: ${book}`;
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/77784828985?text=${encoded}`, '_blank');
+  };
   return (
     <section id="join" className="py-24 lg:py-36 bg-gray-900 relative overflow-hidden">
       <div className="absolute inset-0">
@@ -46,18 +57,18 @@ export default function Join() {
             <form className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="name" className="text-[12px] font-medium text-gray-400">Аты-жөніңіз</label>
-                <input type="text" id="name" className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Асан Үсенов" />
+                <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Асан Үсенов" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="phone" className="text-[12px] font-medium text-gray-400">Телефон</label>
-                <input type="tel" id="phone" className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="+7 700 000 0000" />
+                <input type="tel" id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="+7 700 000 0000" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="book" className="text-[12px] font-medium text-gray-400">Сүйікті кітабыңыз</label>
-                <input type="text" id="book" className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Абай жолы" />
+                <input type="text" id="book" value={book} onChange={(e) => setBook(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Абай жолы" />
               </div>
-              <button type="button" className="w-full mt-2 px-6 py-3.5 bg-accent text-white font-medium rounded-xl hover:bg-accent-hover transition-colors text-[14px]">
-                Жіберу
+              <button type="button" onClick={handleSubmit} className="w-full mt-2 px-6 py-3.5 bg-accent text-white font-medium rounded-xl hover:bg-accent-hover transition-colors text-[14px]">
+                WhatsApp-қа жіберу
               </button>
             </form>
           </motion.div>
