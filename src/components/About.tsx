@@ -194,10 +194,13 @@ export default function About() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-12 text-center"
         >
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 rounded-full shadow-lg shadow-gray-900/20">
+          <a
+            href="#join"
+            className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 rounded-full shadow-lg shadow-gray-900/20 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
+          >
             <span className="text-[13px] text-white/70 font-light">Клубқа қатысу</span>
             <span className="text-[14px] text-white font-semibold tracking-wide">ТЕГІН ✦</span>
-          </div>
+          </a>
         </motion.div>
       </div>
     </section>
