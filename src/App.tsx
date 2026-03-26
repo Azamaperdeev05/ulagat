@@ -4,8 +4,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
+import BookThread from './pages/BookThread';
 
-// Helper component to scroll to top on route change
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -23,6 +23,7 @@ export default function App() {
         <main className="grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/books/:slug" element={<BookThread />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
           </Routes>
