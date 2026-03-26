@@ -12,7 +12,7 @@ export default function Events() {
     {
       id: 2,
       title: 'Қыпшақ аруы',
-      author: 'Мұқтар Мағауин',
+      author: 'Мұхтар Мағауин',
       date: '29 Наурыз',
       time: '12:00',
       image: 'https://resources.cdn-kaspi.kz/img/m/p/p32/pd9/72132017.PNG?format=gallery-large',
