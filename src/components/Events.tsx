@@ -57,8 +57,8 @@ export default function Events() {
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               className="group bg-gray-50 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200/80 hover:border-gray-300 hover:shadow-md transition-all duration-300"
             >
-              {/* Image — square aspect */}
-              <div className="relative overflow-hidden aspect-[9/16]">
+              {/* Image */}
+              <div className="relative overflow-hidden aspect-4/5 sm:aspect-9/16">
                 <img
                   src={event.image}
                   alt={event.title}
