@@ -45,7 +45,7 @@ export const booksData: BookData[] = [
     description:
       'Санкт-Петербургтің ақ түндеріндегі жалғыз қиялшыл жігіт пен Настя арасындағы махаббат хикаясы. Жалғыздық, махаббат, үміт пен қиял — Достоевскийдің ерте кезеңіндегі ең нәзік шығармасы.',
     image:
-      'https://resources.cdn-kaspi.kz/img/m/p/h7e/h11/63826439110686.jpg?format=gallery-large',
+      'https://resources.cdn-kaspi.kz/img/m/p/hca/h4b/64531305660446.jpg?format=gallery-large',
   },
 ];
 
