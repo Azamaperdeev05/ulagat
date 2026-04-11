@@ -68,7 +68,7 @@ export default function Books() {
 
         {/* Book Grid */}
         {!loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {books.map((book, idx) => (
               <motion.div
                 key={book.id}
@@ -79,10 +79,10 @@ export default function Books() {
               >
                 <Link
                   to={`/books/${book.slug}`}
-                  className="group block bg-white rounded-2xl border border-gray-200/80 overflow-hidden hover:border-gray-300 hover:shadow-xl hover:shadow-gray-900/6 transition-all duration-500"
+                  className="group block bg-white rounded-2xl border border-gray-200/80 overflow-hidden hover:border-gray-300 hover:shadow-xl hover:shadow-gray-900/6 transition-all duration-500 h-full flex flex-col"
                 >
                   {/* 9:16 Book cover */}
-                  <div className="relative aspect-[9/16] max-h-[320px] sm:max-h-[400px] overflow-hidden bg-gray-100">
+                  <div className="relative aspect-[9/16] sm:max-h-[400px] overflow-hidden bg-gray-100 shrink-0">
                     <img
                       src={book.image}
                       alt={book.title}
@@ -93,21 +93,21 @@ export default function Books() {
                   </div>
 
                   {/* Book info */}
-                  <div className="p-5">
-                    <h3 className="text-[17px] font-display font-semibold text-gray-900 tracking-tight group-hover:text-accent transition-colors mb-1">
+                  <div className="p-3 sm:p-5 flex flex-col grow">
+                    <h3 className="text-[14px] sm:text-[17px] font-display font-semibold text-gray-900 tracking-tight group-hover:text-accent transition-colors mb-1 line-clamp-2">
                       {book.title}
                     </h3>
-                    <p className="text-[13px] text-gray-400 font-medium mb-3">
-                      {book.author} · {book.year}
+                    <p className="text-[11px] sm:text-[13px] text-gray-400 font-medium mb-1.5 sm:mb-3">
+                      {book.author} <span className="hidden sm:inline">· {book.year}</span>
                     </p>
-                    <p className="text-[13px] text-gray-500 font-light leading-relaxed line-clamp-2">
+                    <p className="hidden sm:block text-[13px] text-gray-500 font-light leading-relaxed line-clamp-2">
                       {book.description}
                     </p>
 
-                    <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                      <span className="text-[13px] text-accent font-medium group-hover:translate-x-1 transition-transform duration-300 inline-flex items-center gap-1">
-                        Талқылауға кіру
-                        <span className="text-accent">→</span>
+                    <div className="mt-auto sm:mt-4 pt-2 sm:pt-4 border-t border-gray-100/50 sm:border-gray-100 flex items-center justify-between">
+                      <span className="text-[11px] sm:text-[13px] text-accent font-medium group-hover:translate-x-1 transition-transform duration-300 inline-flex items-center gap-1">
+                        Кіру
+                        <span className="text-accent hidden sm:inline">→</span>
                       </span>
                     </div>
                   </div>

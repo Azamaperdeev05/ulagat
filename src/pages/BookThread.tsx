@@ -309,13 +309,17 @@ export default function BookThread() {
       <div className="min-h-screen bg-gray-50 pt-28 pb-8">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           {/* Back */}
-          <Link
-            to="/#books"
-            className="inline-flex items-center gap-2 text-[13px] text-gray-500 hover:text-gray-900 transition-colors mb-6 group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            Кітаптарға оралу
-          </Link>
+          <div className="sticky top-[80px] sm:top-[96px] z-40 bg-gray-50/95 backdrop-blur-md pb-4 pt-2 mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 flex items-center shadow-[0_10px_20px_-10px_rgba(249,250,251,1)]">
+            <Link
+              to="/#books"
+              className="inline-flex items-center gap-2 text-[13px] text-gray-600 hover:text-gray-900 transition-colors font-medium group"
+            >
+              <div className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200 group-hover:border-gray-300 transition-colors">
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              </div>
+              Кітаптарға оралу
+            </Link>
+          </div>
 
           {/* ─── Main post card ─── */}
           <motion.div

@@ -20,33 +20,40 @@ export default function BlogPostPage() {
 
   return (
     <>
+      {/* Sticky Back Button */}
+      <div className="sticky top-[80px] z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center px-6 py-3">
+        <div className="max-w-3xl mx-auto w-full">
+          <Link
+            to="/blog"
+            className="inline-flex items-center gap-2 text-[13px] text-gray-600 hover:text-gray-900 transition-colors font-medium group"
+          >
+            <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 group-hover:bg-gray-200 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </div>
+            Блогқа оралу
+          </Link>
+        </div>
+      </div>
+
       {/* Hero */}
       <section className="relative">
-        <div className="h-[50vh] md:h-[60vh] relative overflow-hidden">
+        <div className="h-[40vh] md:h-[50vh] relative overflow-hidden">
           <img
             src={post.image}
             alt={post.title}
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-gray-900/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 pb-10 md:pb-16">
+        <div className="absolute bottom-0 left-0 right-0 pb-8 md:pb-12">
           <div className="max-w-3xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
             >
-              <Link
-                to="/blog"
-                className="inline-flex items-center gap-2 text-[13px] text-gray-300 hover:text-white transition-colors mb-6"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Блогқа оралу
-              </Link>
-
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 <span className="bg-accent text-white px-3 py-1 rounded-full text-[11px] font-semibold">
                   {post.category}
