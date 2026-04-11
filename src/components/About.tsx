@@ -345,8 +345,22 @@ export default function About() {
 
       {/* ─── SECTION 4: «Ұлағат үні» — Dark cinema showcase ─── */}
       <section className="relative py-28 lg:py-40 bg-gray-900 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <motion.img 
+            initial={{ scale: 1.1, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 0.4 }}
+            viewport={{ once: true }}
+            transition={{ duration: 2, ease: "easeOut" }}
+            src="/photos/жалпы барлығы түскен.jpg" 
+            alt="Ұлағат үні ансамблі" 
+            className="w-full h-full object-cover mix-blend-luminosity pointer-events-none" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-900/40 to-gray-900" />
+        </div>
+
         {/* Ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full bg-gradient-to-r from-amber-500/8 via-orange-500/5 to-transparent blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent blur-[120px] pointer-events-none mix-blend-screen" />
         
         {/* Floating particles */}
         <FloatingParticles count={8} />

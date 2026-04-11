@@ -1,18 +1,34 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Instagram, Send } from 'lucide-react';
 
 export default function Join() {
+  const location = useLocation();
+  const [formType, setFormType] = useState<'club' | 'ensemble'>('club');
+
+  useEffect(() => {
+    if (location.state?.activeTab === 'ensemble') {
+      setFormType('ensemble');
+    }
+  }, [location.state]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [book, setBook] = useState('');
+  const [talent, setTalent] = useState('');
 
   const handleSubmit = () => {
     if (!name.trim()) return alert('Аты-жөніңізді жазыңыз');
-    const message = `🔖 ULAGAT клубына өтінім\n\n👤 Аты-жөні: ${name}\n📞 Телефон: ${phone}\n📚 Сүйікті кітабы: ${book}`;
+    let message = '';
+    if (formType === 'club') {
+      message = `🔖 ULAGAT клубына өтінім\n\n👤 Аты-жөні: ${name}\n📞 Телефон: ${phone}\n📚 Сүйікті кітабы/Соңғы оқығаны: ${book}`;
+    } else {
+      message = `🎵 ULAGAT ҮНІ ансамбліне өтінім\n\n👤 Аты-жөні: ${name}\n📞 Телефон: ${phone}\n🎸 Өнері/Аспабы: ${talent}`;
+    }
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/77784828985?text=${encoded}`, '_blank');
   };
+
   return (
     <section id="join" className="py-24 lg:py-36 bg-gray-900 relative overflow-hidden">
       <div className="absolute inset-0">
@@ -33,7 +49,7 @@ export default function Join() {
               Сен де осы рухани <span className="text-gray-400">ортаға қосыл.</span>
             </h2>
             <p className="text-base text-gray-400 font-light leading-relaxed mb-8 max-w-lg">
-              Кітап оқу — жеке процесс болғанымен, оны талқылау — ортақ қуаныш.
+              Кітап оқу — жеке процесс болғанымен, оны талқылау — ортақ қуаныш. Бұған қоса, өнеріңді ортаға салып, ансамбльмен бірге сахнаға шығуға да мүмкіндік бар.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a href="#" className="group flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 transition-colors text-[13px]">
@@ -51,26 +67,82 @@ export default function Join() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="bg-gray-800/50 backdrop-blur-xl p-8 md:p-10 rounded-2xl border border-gray-700/50"
+            className="bg-gray-800/50 backdrop-blur-xl p-8 md:p-10 rounded-2xl border border-gray-700/50 overflow-hidden"
           >
-            <h3 className="text-xl font-display font-semibold text-white mb-6">Өтінім қалдыру</h3>
-            <form className="flex flex-col gap-5">
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="name" className="text-[12px] font-medium text-gray-400">Аты-жөніңіз</label>
-                <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Асан Үсенов" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <h3 className="text-xl font-display font-semibold text-white">Өтінім қалдыру</h3>
+              
+              <div className="flex p-0.5 bg-gray-900/80 rounded-lg border border-gray-700 w-fit shrink-0">
+                <button 
+                  onClick={() => setFormType('club')}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 ${formType === 'club' ? 'bg-accent text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Клубқа
+                </button>
+                <button 
+                  onClick={() => setFormType('ensemble')}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 ${formType === 'ensemble' ? 'bg-amber-500 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Ансамбльге
+                </button>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="phone" className="text-[12px] font-medium text-gray-400">Телефон</label>
-                <input type="tel" id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="+7 700 000 0000" />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="book" className="text-[12px] font-medium text-gray-400">Соңғы оқыған кітабыңыз</label>
-                <input type="text" id="book" value={book} onChange={(e) => setBook(e.target.value)} className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Абай жолы (немесе оқымадым)" />
-              </div>
-              <button type="button" onClick={handleSubmit} className="w-full mt-2 px-6 py-3.5 bg-accent text-white font-medium rounded-xl hover:bg-accent-hover transition-colors text-[14px]">
-                WhatsApp-қа жіберу
-              </button>
-            </form>
+            </div>
+
+            <div className="h-[360px]">
+              <AnimatePresence mode="wait">
+                {formType === 'club' ? (
+                  <motion.form 
+                    key="club"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex flex-col gap-5 h-full"
+                  >
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="name-club" className="text-[12px] font-medium text-gray-400">Аты-жөніңіз</label>
+                      <input type="text" id="name-club" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-gray-700/30 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Асан Үсенов" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="phone-club" className="text-[12px] font-medium text-gray-400">Телефон</label>
+                      <input type="tel" id="phone-club" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-gray-700/30 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="+7 700 000 0000" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="book" className="text-[12px] font-medium text-gray-400">Соңғы оқыған кітабыңыз</label>
+                      <input type="text" id="book" value={book} onChange={(e) => setBook(e.target.value)} className="w-full px-4 py-3 bg-gray-700/30 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Абай жолы (немесе оқымадым)" />
+                    </div>
+                    <button type="button" onClick={handleSubmit} className="w-full mt-2 px-6 py-3.5 bg-accent text-white font-medium rounded-xl hover:bg-accent-hover transition-colors text-[14px]">
+                      Клубқа өтінім жіберу
+                    </button>
+                  </motion.form>
+                ) : (
+                  <motion.form 
+                    key="ensemble"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex flex-col gap-5 h-full"
+                  >
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="name-ens" className="text-[12px] font-medium text-gray-400">Аты-жөніңіз</label>
+                      <input type="text" id="name-ens" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-gray-700/30 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Асан Үсенов" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="phone-ens" className="text-[12px] font-medium text-gray-400">Телефон</label>
+                      <input type="tel" id="phone-ens" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 bg-gray-700/30 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="+7 700 000 0000" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="talent" className="text-[12px] font-medium text-gray-400">Сіздің өнеріңіз немесе аспабыңыз</label>
+                      <input type="text" id="talent" value={talent} onChange={(e) => setTalent(e.target.value)} className="w-full px-4 py-3 bg-gray-700/30 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition-all text-white placeholder-gray-500 text-[14px]" placeholder="Мысалы: Домбыра, Ән айту, Вокал" />
+                    </div>
+                    <button type="button" onClick={handleSubmit} className="w-full mt-2 px-6 py-3.5 bg-amber-500 text-white font-medium rounded-xl hover:bg-amber-600 transition-colors text-[14px]">
+                      Ансамбльге өтінім жіберу
+                    </button>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         </div>
       </div>

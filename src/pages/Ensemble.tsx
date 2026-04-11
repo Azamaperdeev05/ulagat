@@ -7,24 +7,26 @@ import Footer from '../components/Footer';
 interface Member {
   name: string;
   gender: 'female' | 'male';
+  photo?: string;
 }
 
 const members: Member[] = [
-  { name: 'Аубакирова Аружан Ардаққызы', gender: 'female' },
-  { name: 'Серікбай Жансая Болатқызы', gender: 'female' },
-  { name: 'Жанат Айару', gender: 'female' },
-  { name: 'Мұқатай Аяулы Нұрланқызы', gender: 'female' },
-  { name: 'Хасенова Қарлығаш Топайқызы', gender: 'female' },
-  { name: 'Жақсылық Марат Аманұлы', gender: 'male' },
-  { name: 'Нэрбол Әсем', gender: 'female' },
-  { name: 'Жаргакова Айдана Жанатқызы', gender: 'female' },
-  { name: 'Жәңгір Шынарбек Өмірбекұлы', gender: 'male' },
-  { name: 'Шайкен Данияр Аблайұлы', gender: 'male' },
-  { name: 'Марат Арайлым Төлеуханқызы', gender: 'female' },
-  { name: 'Дулатқызы Диана', gender: 'female' },
-  { name: 'Зейнел Зере Мақсатқызы', gender: 'female' },
-  { name: 'Рашид Қазыбек', gender: 'male' },
-  { name: 'Искаков Дархан Рымбайұлы', gender: 'male' },
+  { name: 'Аубакирова Аружан Ардаққызы', gender: 'female', photo: '/photos/Аружан.jpg' },
+  { name: 'Серікбай Жансая Болатқызы', gender: 'female', photo: '/photos/Жансая.jpg' },
+  { name: 'Жанат Айару', gender: 'female', photo: '/photos/Айару.jpg' },
+  { name: 'Мұқатай Аяулы Нұрланқызы', gender: 'female', photo: '/photos/Аяулы.jpg' },
+  { name: 'Хасенова Қарлығаш Топайқызы', gender: 'female', photo: '/photos/Қарлығаш.jpg' },
+  { name: 'Жақсылық Марат Аманұлы', gender: 'male', photo: '/photos/Марат.jpg' },
+  { name: 'Нэрбол Әсем', gender: 'female', photo: '/photos/Әсем.jpg' },
+  { name: 'Жаргакова Айдана Жанатқызы', gender: 'female', photo: '/photos/Айдана.jpg' },
+  { name: 'Жәңгір Шынарбек Өмірбекұлы', gender: 'male', photo: '/photos/Шынарбек.jpg' },
+  { name: 'Шайкен Данияр Аблайұлы', gender: 'male', photo: '/photos/Данияр.jpg' },
+  { name: 'Марат Арайлым Төлеуханқызы', gender: 'female', photo: '/photos/Арайлым.jpg' },
+  { name: 'Дулатқызы Диана', gender: 'female', photo: '/photos/Диана.jpg' },
+  { name: 'Зейнел Зере Мақсатқызы', gender: 'female', photo: '/photos/Зере.jpg' },
+  { name: 'Рашид Қазыбек', gender: 'male', photo: '/photos/Қазыбек.jpg' },
+  { name: 'Искаков Дархан Рымбайұлы', gender: 'male', photo: '/photos/Дархан ағай.jpg' },
+  { name: 'Айсұлтан', gender: 'male', photo: '/photos/Айсұлтан.jpg' },
 ];
 
 const femaleColors = [
@@ -129,36 +131,44 @@ function MemberCard({ member, index, ...rest }: { member: Member; index: number;
         <div className="relative rounded-[28px] overflow-hidden cursor-default">
           {/* Gradient background */}
           <div className="aspect-3/4 relative overflow-hidden">
-            <div className={`absolute inset-0 bg-linear-to-br ${getGradient(member)}`} />
+            {member.photo ? (
+              <img src={member.photo} alt={member.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            ) : (
+              <div className={`absolute inset-0 bg-linear-to-br ${getGradient(member)}`} />
+            )}
 
-            {/* Animated shimmer */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
-              initial={{ x: '-100%' }}
-              whileHover={{ x: '200%' }}
-              transition={{ duration: 0.8, ease: 'easeInOut' }}
-            />
+            {/* Animated shimmer (only if no photo) */}
+            {!member.photo && (
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
+                initial={{ x: '-100%' }}
+                whileHover={{ x: '200%' }}
+                transition={{ duration: 0.8, ease: 'easeInOut' }}
+              />
+            )}
 
-            {/* Glass circle */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative">
-                {/* Pulse glow */}
-                <motion.div
-                  className="absolute inset-[-12px] rounded-full bg-white/10 blur-xl"
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <motion.div
-                  className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/25"
-                  whileHover={{ scale: 1.15, borderColor: 'rgba(255,255,255,0.5)' }}
-                  transition={{ type: 'spring', stiffness: 300 }}
-                >
-                  <span className="text-white text-3xl sm:text-4xl font-display font-bold tracking-tight drop-shadow-lg">
-                    {getInitials(member.name)}
-                  </span>
-                </motion.div>
+            {/* Glass circle (only if no photo) */}
+            {!member.photo && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative">
+                  {/* Pulse glow */}
+                  <motion.div
+                    className="absolute inset-[-12px] rounded-full bg-white/10 blur-xl"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <motion.div
+                    className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/25"
+                    whileHover={{ scale: 1.15, borderColor: 'rgba(255,255,255,0.5)' }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <span className="text-white text-3xl sm:text-4xl font-display font-bold tracking-tight drop-shadow-lg">
+                      {getInitials(member.name)}
+                    </span>
+                  </motion.div>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Bottom fade */}
             <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
@@ -226,16 +236,26 @@ export default function Ensemble() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
 
-  const femaleMembers = members.filter((m) => m.gender === 'female');
-  const maleMembers = members.filter((m) => m.gender === 'male');
-
   return (
     <>
       <div className="min-h-screen bg-[#000000]">
         {/* ─── Hero — Cinematic fullscreen ─── */}
         <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <motion.img 
+              initial={{ scale: 1.1, opacity: 0 }}
+              animate={{ scale: 1, opacity: 0.4 }}
+              transition={{ duration: 2, ease: "easeOut" }}
+              src="/photos/жалпы барлығы түскен.jpg" 
+              alt="Ұлағат үні ансамблі" 
+              className="w-full h-full object-cover mix-blend-luminosity pointer-events-none" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-[#000000]" />
+          </div>
+
           {/* Animated ambient glows */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 mix-blend-screen">
             <motion.div
               className="absolute top-[20%] left-[20%] w-[500px] h-[500px] rounded-full bg-amber-500/8 blur-[150px]"
               animate={{ scale: [1, 1.2, 1], x: [0, 30, 0] }}
@@ -257,12 +277,12 @@ export default function Ensemble() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
-            className="absolute top-0 left-0 right-0 pt-24 px-6 z-20"
+            className="fixed top-[88px] left-0 right-0 px-6 z-[60] pointer-events-none"
           >
             <div className="max-w-[980px] mx-auto">
               <Link
                 to="/"
-                className="inline-flex items-center gap-2 text-[13px] text-gray-500 hover:text-white transition-colors group"
+                className="inline-flex items-center gap-2 text-[13px] text-white/70 hover:text-white bg-black/20 hover:bg-black/40 backdrop-blur-md px-4 py-2 rounded-full transition-all group w-fit pointer-events-auto border border-white/10"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 Басты бетке
@@ -406,8 +426,8 @@ export default function Ensemble() {
           </div>
         </section>
 
-        {/* ─── Female members ─── */}
-        <section className="py-24 lg:py-32 bg-white">
+        {/* ─── Performers ─── */}
+        <section className="relative py-24 lg:py-32 bg-white">
           <div className="max-w-[1200px] mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -421,55 +441,24 @@ export default function Ensemble() {
                 whileInView={{ opacity: 1, letterSpacing: '0.25em' }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="text-[13px] font-semibold uppercase text-rose-400 mb-4"
+                className="text-[13px] font-semibold uppercase text-amber-500 mb-4"
               >
-                Қыздар
+                Ансамбль мүшелері
               </motion.p>
               <h3 className="text-[36px] sm:text-[44px] md:text-[52px] font-display font-semibold text-gray-900 tracking-[-0.02em] leading-none">
-                Әйел өнерпаздар.
+                Өнерпаздар.
               </h3>
             </motion.div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
-              {femaleMembers.map((member, i) => (
+              {members.map((member, i) => (
                 <MemberCard key={member.name} member={member} index={i} />
               ))}
             </div>
           </div>
         </section>
 
-        {/* ─── Male members — dark section ─── */}
-        <section className="relative py-24 lg:py-32 bg-gray-900 overflow-hidden">
-          <FloatingNotes />
-          <div className="relative max-w-[1200px] mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-center mb-16"
-            >
-              <motion.p
-                initial={{ opacity: 0, letterSpacing: '0.1em' }}
-                whileInView={{ opacity: 1, letterSpacing: '0.25em' }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-[13px] font-semibold uppercase text-blue-400 mb-4"
-              >
-                Ұлдар
-              </motion.p>
-              <h3 className="text-[36px] sm:text-[44px] md:text-[52px] font-display font-semibold text-white tracking-[-0.02em] leading-none">
-                Ер өнерпаздар.
-              </h3>
-            </motion.div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-5">
-              {maleMembers.map((member, i) => (
-                <MemberCard key={member.name} member={member} index={i} />
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ─── CTA ─── */}
         <section className="py-28 lg:py-36 bg-white">
@@ -488,6 +477,7 @@ export default function Ensemble() {
               </p>
               <Link
                 to="/#join"
+                state={{ activeTab: 'ensemble' }}
                 className="group inline-flex items-center gap-2.5 text-[17px] text-amber-500 font-medium hover:text-amber-600 transition-colors"
               >
                 Өтінім қалдыру
