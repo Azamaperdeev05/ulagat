@@ -21,7 +21,7 @@ export default function Footer() {
           <div className="flex flex-col gap-4">
             <h4 className="text-[12px] font-semibold text-accent tracking-widest uppercase">Навигация</h4>
             <ul className="flex flex-col gap-3">
-              {['Біз туралы', 'Іс-шаралар', 'Кітаптар', 'Галерея', 'Блог'].map((link) => (
+              {['Біз туралы', 'Іс-шаралар', 'Кітаптар', 'Блог'].map((link) => (
                 <li key={link}>
                   <a href={`#${link.toLowerCase()}`} className="text-[13px] text-gray-400 hover:text-white transition-colors">{link}</a>
                 </li>

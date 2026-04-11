@@ -7,6 +7,8 @@ import Terms from './pages/Terms';
 import BookThread from './pages/BookThread';
 import Ensemble from './pages/Ensemble';
 import Apply from './pages/Apply';
+import BlogPage from './pages/BlogPage';
+import BlogPostPage from './pages/BlogPostPage';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -34,6 +36,8 @@ export default function App() {
             <Route path="/books/:slug" element={<BookThread />} />
             <Route path="/ensemble" element={<Ensemble />} />
             <Route path="/apply" element={<Apply />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             {/* Catch-all: redirect to home */}

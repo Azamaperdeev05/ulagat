@@ -1,36 +1,10 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { blogPosts } from '../data/blogPosts';
 
 export default function Blog() {
-  const posts = [
-    {
-      id: 1,
-      title: 'Кітап оқу мәдениеті: Неден бастау керек?',
-      category: 'Ой толғау',
-      date: '10 Наурыз, 2026',
-      readTime: '5 мин',
-      image: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=2670&auto=format&fit=crop',
-      excerpt: 'Күнделікті күйбең тіршілікте кітап оқуға қалай уақыт табуға болады?',
-    },
-    {
-      id: 2,
-      title: 'Абайдың қара сөздері бүгінгі қоғамда',
-      category: 'Мәдениет',
-      date: '5 Наурыз, 2026',
-      readTime: '8 мин',
-      image: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2070&auto=format&fit=crop',
-      excerpt: 'Ұлы ойшылдың мұрасы қазіргі жастар үшін неліктен маңызды?',
-    },
-    {
-      id: 3,
-      title: 'Үздік 10 қазақ романы',
-      category: 'Кітап review',
-      date: '1 Наурыз, 2026',
-      readTime: '12 мин',
-      image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2656&auto=format&fit=crop',
-      excerpt: 'Оқырман клубы ұсынатын ең үздік отандық шығармалар тізімі.',
-    },
-  ];
+  const previewPosts = blogPosts.slice(0, 3);
 
   return (
     <section id="blog" className="py-24 lg:py-36 bg-gray-50">
@@ -51,22 +25,25 @@ export default function Blog() {
             </h2>
           </motion.div>
 
-          <motion.a
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            href="#all-posts"
-            className="group flex items-center gap-2 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
           >
-            Барлық мақалалар
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-          </motion.a>
+            <Link
+              to="/blog"
+              className="group flex items-center gap-2 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
+            >
+              Барлық мақалалар
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </motion.div>
         </div>
 
         {/* Posts Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post, idx) => (
+          {previewPosts.map((post, idx) => (
             <motion.article
               key={post.id}
               initial={{ opacity: 0, y: 30 }}
@@ -106,13 +83,13 @@ export default function Blog() {
                   {post.excerpt}
                 </p>
 
-                <a
-                  href={`#post-${post.id}`}
+                <Link
+                  to={`/blog/${post.slug}`}
                   className="group/link flex items-center gap-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-900 transition-colors mt-auto"
                 >
                   Толығырақ
                   <ArrowRight className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform" />
-                </a>
+                </Link>
               </div>
             </motion.article>
           ))}

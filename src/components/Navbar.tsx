@@ -30,7 +30,6 @@ export default function Navbar() {
     { name: 'Біз туралы', href: '/#about' },
     { name: 'Іс-шаралар', href: '/#events' },
     { name: 'Кітаптар', href: '/#books' },
-    { name: 'Галерея', href: '/#gallery' },
     { name: 'Блог', href: '/#blog' },
     { name: 'Команда', href: '/#team' },
   ];
