@@ -15,7 +15,12 @@ function ScrollToTop() {
   useEffect(() => {
     if (hash) {
       setTimeout(() => {
-        document.getElementById(hash.replace('#', ''))?.scrollIntoView({ behavior: 'smooth' });
+        const id = hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          const y = element.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
       }, 100);
     } else {
       window.scrollTo(0, 0);
