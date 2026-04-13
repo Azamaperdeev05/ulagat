@@ -304,7 +304,7 @@ export default function BookThread() {
   };
 
   const handleShare = async () => {
-    const url = `https://ulagat-krg.vercel.app/books/${slug}`;
+    const url = `https://ulagatkrg.kz/books/${slug}`;
     try { await navigator.clipboard.writeText(url); }
     catch { const el = document.createElement('input'); el.value = url; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); }
     setCopied(true);

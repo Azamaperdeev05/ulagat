@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 const SITE_NAME = 'ULAGAT';
-const SITE_URL = 'https://ulagat-krg.vercel.app';
+const SITE_URL = 'https://ulagatkrg.kz';
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 type SeoType = 'website' | 'article';

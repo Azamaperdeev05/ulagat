@@ -31,7 +31,7 @@ export default function BlogPostPage() {
             '@type': 'Organization',
             name: 'ULAGAT',
           },
-          mainEntityOfPage: `https://ulagat-krg.vercel.app/blog/${post.slug}`,
+          mainEntityOfPage: `https://ulagatkrg.kz/blog/${post.slug}`,
         }
       : undefined,
   });

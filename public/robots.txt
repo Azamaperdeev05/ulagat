@@ -10,4 +10,4 @@ Allow: /
 User-agent: Yandex
 Allow: /
 
-Sitemap: https://ulagat-krg.vercel.app/sitemap.xml
+Sitemap: https://ulagatkrg.kz/sitemap.xml
