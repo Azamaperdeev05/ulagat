@@ -1,7 +1,14 @@
 import { motion } from 'framer-motion';
 import Footer from '../components/Footer';
+import { useSeo } from '../lib/seo';
 
 export default function PrivacyPolicy() {
+  useSeo({
+    title: 'Құпиялылық саясаты - ULAGAT',
+    description: 'ULAGAT оқырман клубының құпиялылық саясаты: дербес деректерді жинау, сақтау және өңдеу ережелері.',
+    path: '/privacy',
+  });
+
   return (
     <div className="min-h-screen bg-white">
       <main className="max-w-4xl mx-auto px-6 pt-32 pb-24">

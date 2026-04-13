@@ -3,8 +3,16 @@ import React, { useState } from 'react';
 import { Send, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import { useSeo } from '../lib/seo';
 
 export default function Apply() {
+  useSeo({
+    title: 'Клубқа қосылу - ULAGAT',
+    description:
+      'ULAGAT оқырман клубына онлайн өтінім беріңіз. Кітап талқылауына, мәдени ортаға және ULAGAT Үні ансамбліне қосылыңыз.',
+    path: '/apply',
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',

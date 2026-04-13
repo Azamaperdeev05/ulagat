@@ -4,10 +4,37 @@ import { ArrowLeft, Clock, Calendar, User, ArrowRight } from 'lucide-react';
 import { blogPosts } from '../data/blogPosts';
 import Footer from '../components/Footer';
 import ReactMarkdown from 'react-markdown';
+import { useSeo } from '../lib/seo';
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const post = blogPosts.find(p => p.slug === slug);
+
+  useSeo({
+    title: post ? `${post.title} | ULAGAT блогы` : 'Блог - ULAGAT',
+    description: post?.excerpt || 'ULAGAT блогындағы мақаланы оқыңыз.',
+    path: post ? `/blog/${post.slug}` : '/blog',
+    image: post?.image,
+    type: post ? 'article' : 'website',
+    structuredData: post
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: post.title,
+          description: post.excerpt,
+          image: [post.image],
+          author: {
+            '@type': 'Person',
+            name: post.author,
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'ULAGAT',
+          },
+          mainEntityOfPage: `https://ulagat-krg.vercel.app/blog/${post.slug}`,
+        }
+      : undefined,
+  });
 
   if (!post) {
     return <Navigate to="/blog" replace />;

@@ -1,7 +1,14 @@
 import { motion } from 'framer-motion';
 import Footer from '../components/Footer';
+import { useSeo } from '../lib/seo';
 
 export default function Terms() {
+  useSeo({
+    title: 'Пайдалану шарттары - ULAGAT',
+    description: 'ULAGAT платформасын қолдану шарттары, мүшелік ережелері және зияткерлік меншік талаптары.',
+    path: '/terms',
+  });
+
   return (
     <div className="min-h-screen bg-white">
       <main className="max-w-4xl mx-auto px-6 pt-32 pb-24">

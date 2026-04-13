@@ -3,8 +3,16 @@ import { ArrowRight, Clock, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { blogPosts } from '../data/blogPosts';
 import Footer from '../components/Footer';
+import { useSeo } from '../lib/seo';
 
 export default function BlogPage() {
+  useSeo({
+    title: 'Блог - ULAGAT',
+    description:
+      'ULAGAT блогы: кітап оқу мәдениеті, қазақ әдебиеті, өнер, тіл және жастар дамуы туралы мақалалар.',
+    path: '/blog',
+  });
+
   const featured = blogPosts[0];
   const rest = blogPosts.slice(1);
 

@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'fram
 import { ArrowLeft, Music, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import { useSeo } from '../lib/seo';
 
 interface Member {
   name: string;
@@ -227,6 +228,13 @@ function FloatingNotes() {
 }
 
 export default function Ensemble() {
+  useSeo({
+    title: 'ULAGAT Үні - Ансамбль | ULAGAT',
+    description:
+      'ULAGAT Үні ансамблі: домбыра, вокал және шығармашылық орта. Қарағанды жастарының әдебиет пен музыканы тоғыстырған ұжымы.',
+    path: '/ensemble',
+  });
+
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,

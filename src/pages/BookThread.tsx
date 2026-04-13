@@ -24,6 +24,7 @@ import {
   type Comment as FBComment,
 } from '../lib/bookService';
 import Footer from '../components/Footer';
+import { useSeo } from '../lib/seo';
 
 /* ── Helpers ── */
 const getInitials = (name: string) =>
@@ -205,6 +206,16 @@ export default function BookThread() {
   const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
+
+  useSeo({
+    title: book ? `${book.title} - кітап талқылауы | ULAGAT` : 'Кітап талқылауы - ULAGAT',
+    description: book
+      ? `${book.title} (${book.author}) кітабы бойынша ULAGAT қауымдастығының пікірлері мен талқылауы.`
+      : 'ULAGAT оқырман клубының кітап талқылау беті.',
+    path: slug ? `/books/${slug}` : '/books',
+    image: book?.image,
+    type: 'article',
+  });
 
   useEffect(() => {
     const unsub = subscribeBooks((books) => {
