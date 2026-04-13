@@ -47,6 +47,13 @@ function upsertStructuredData(data: Record<string, unknown>) {
   script.textContent = JSON.stringify(data);
 }
 
+function removeDynamicStructuredData() {
+  const script = document.head.querySelector<HTMLScriptElement>('script[data-seo-ld="dynamic"]');
+  if (script) {
+    script.remove();
+  }
+}
+
 function normalizePath(path?: string) {
   if (!path || path === '/') return '/';
   return path.startsWith('/') ? path : `/${path}`;
@@ -81,6 +88,8 @@ export function useSeo(options: SeoOptions) {
 
     if (options.structuredData) {
       upsertStructuredData(options.structuredData);
+    } else {
+      removeDynamicStructuredData();
     }
   }, [options]);
 }

@@ -9,6 +9,7 @@ import Ensemble from './pages/Ensemble';
 import Apply from './pages/Apply';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
+import { trackPageView } from './lib/analytics';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -29,10 +30,21 @@ function ScrollToTop() {
   return null;
 }
 
+function AnalyticsTracker() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    trackPageView(`${pathname}${search}`);
+  }, [pathname, search]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <Router>
       <ScrollToTop />
+      <AnalyticsTracker />
       <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-white">
         <Navbar />
         <main className="grow">

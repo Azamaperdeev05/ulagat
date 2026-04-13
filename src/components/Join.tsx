@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Instagram, Send } from 'lucide-react';
+import { trackEvent } from '../lib/analytics';
 
 export default function Join() {
   const location = useLocation();
@@ -26,6 +27,7 @@ export default function Join() {
       message = `🎵 ULAGAT ҮНІ ансамбліне өтінім\n\n👤 Аты-жөні: ${name}\n📞 Телефон: ${phone}\n🎸 Өнері/Аспабы: ${talent}`;
     }
     const encoded = encodeURIComponent(message);
+    trackEvent('lead_submit_whatsapp', { source: 'join-section', type: formType });
     window.open(`https://wa.me/77784828985?text=${encoded}`, '_blank');
   };
 
@@ -52,7 +54,7 @@ export default function Join() {
               Кітап оқу — жеке процесс болғанымен, оны талқылау — ортақ қуаныш. Бұған қоса, өнеріңді ортаға салып, ансамбльмен бірге сахнаға шығуға да мүмкіндік бар.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <a href="#" className="group flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 transition-colors text-[13px]">
+              <a href="https://t.me/ulagat_krg_bot" target="_blank" rel="noopener noreferrer" className="group flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-gray-900 font-medium rounded-full hover:bg-gray-100 transition-colors text-[13px]">
                 <Send className="w-3.5 h-3.5" /> Telegram
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </a>

@@ -4,6 +4,8 @@ import { Send, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { useSeo } from '../lib/seo';
+import { submitLead } from '../lib/crm';
+import { trackEvent } from '../lib/analytics';
 
 export default function Apply() {
   useSeo({
@@ -21,15 +23,40 @@ export default function Apply() {
     interest: 'books',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Send to Firebase or email
-    setSubmitted(true);
+    setSubmitError('');
+    setSubmitting(true);
+
+    try {
+      await submitLead({
+        name: formData.name,
+        phone: formData.phone,
+        city: formData.city,
+        about: formData.about,
+        interest: formData.interest,
+        source: 'apply-page',
+      });
+
+      trackEvent('lead_submit', {
+        source: 'apply-page',
+        interest: formData.interest,
+      });
+
+      setSubmitted(true);
+    } catch (error) {
+      setSubmitError('Өтінім жіберілмеді. Сәлден кейін қайта көріңіз.');
+      trackEvent('lead_submit_failed', { source: 'apply-page' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -168,11 +195,16 @@ export default function Apply() {
                   type="submit"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  disabled={submitting}
                   className="w-full py-4 bg-gray-900 text-white text-[15px] font-medium rounded-2xl hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20 flex items-center justify-center gap-2.5"
                 >
                   <Send className="w-4 h-4" />
-                  Өтінім жіберу
+                  {submitting ? 'Жіберілуде...' : 'Өтінім жіберу'}
                 </motion.button>
+
+                {submitError && (
+                  <p className="text-[13px] text-red-500 text-center">{submitError}</p>
+                )}
 
                 <p className="text-[12px] text-gray-400 text-center font-light">
                   Өтінім жіберу арқылы сіз{' '}
