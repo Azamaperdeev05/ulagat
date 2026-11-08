@@ -279,9 +279,9 @@ export default function About() {
               </h3>
               <p className="text-[17px] text-gray-500 leading-[1.7] font-light max-w-lg mb-5">
                 Кездесулер Қарағанды қаласындағы Qasymkitap кітап дүкенінің филиалында
-                өтеді. Клубқа қатысу тегін, әрі баспаның әр кітабына Ұлағат
+                өтеді. Клубқа кіру жарнасы — 2 000 ₸, әрі баспаның әр кітабына Ұлағат
                 оқырмандарына{' '}
-                <span className="font-semibold text-green-600">15% жеңілдік</span>{' '}
+                <span className="font-semibold text-accent">15% жеңілдік</span>{' '}
                 қарастырылған.
               </p>
               <motion.a
@@ -466,26 +466,75 @@ export default function About() {
         </div>
       </section>
 
-      {/* ─── SECTION 5: CTA join ─── */}
-      <section className="py-20 lg:py-24 bg-white">
-        <div className="max-w-[980px] mx-auto px-6 text-center">
+      {/* ─── SECTION 5: Membership & Entry Fee ─── */}
+      <section className="py-20 lg:py-28 bg-[#faf8f5] border-t border-gray-200/70">
+        <div className="max-w-[980px] mx-auto px-6">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="relative bg-white rounded-3xl p-8 sm:p-12 border border-gray-200/90 shadow-xl shadow-gray-900/4 overflow-hidden"
           >
-            <MagneticWrap>
-              <motion.a
-                href="#join"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 rounded-full shadow-lg shadow-gray-900/20 hover:shadow-xl hover:bg-gray-800 transition-all duration-300 cursor-pointer"
-              >
-                <span className="text-[15px] text-white/70 font-light">Клубқа қатысу</span>
-                <span className="text-[16px] text-white font-semibold tracking-wide">ТЕГІН ✦</span>
-              </motion.a>
-            </MagneticWrap>
+            <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
+            
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative z-10">
+              <div className="max-w-xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-light border border-accent/20 mb-4">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  <span className="text-[12px] font-semibold text-accent uppercase tracking-wider">Клубқа кіру</span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-display font-semibold text-gray-900 tracking-tight mb-3">
+                  Оқырман қауымдастығына қосылыңыз
+                </h3>
+                <p className="text-[15px] sm:text-[16px] text-gray-500 font-light leading-relaxed mb-6">
+                  Әр екі апта сайынғы жанды кітап талдаулары, рухани орта, Qasymkitap баспасынан 15% жеңілдік және пікірлес жастар.
+                </p>
+                <div className="flex flex-wrap items-center gap-4 text-[13px] text-gray-600 font-medium">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    2 апта сайын бас қосу
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    15% баспа жеңілдігі
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Айбану үйлестіруші: +7 747 447 6486
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:items-center md:items-end w-full md:w-auto shrink-0 bg-gray-50 md:bg-transparent p-6 md:p-0 rounded-2xl border border-gray-100 md:border-0">
+                <div className="text-[12px] uppercase tracking-wider text-gray-400 font-medium mb-1">Кіру жарнасы</div>
+                <div className="text-4xl font-display font-bold text-gray-900 tracking-tight mb-1">
+                  2 000 <span className="text-2xl text-accent">₸</span>
+                </div>
+                <div className="text-[12px] text-gray-400 font-light mb-6">клуб мүшелігіне қабылдау</div>
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  <motion.a
+                    href="#join"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-6 py-3.5 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-colors text-[13px] text-center"
+                  >
+                    Өтінім қалдыру
+                  </motion.a>
+                  <motion.a
+                    href="https://wa.me/77474476486"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-6 py-3.5 bg-accent hover:bg-accent-hover text-white font-medium rounded-full transition-colors text-[13px] text-center shadow-sm"
+                  >
+                    Айбануға жазу (WhatsApp)
+                  </motion.a>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>

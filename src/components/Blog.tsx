@@ -7,7 +7,7 @@ export default function Blog() {
   const previewPosts = blogPosts.slice(0, 3);
 
   return (
-    <section id="blog" className="py-24 lg:py-36 bg-gray-50">
+    <section id="blog" className="py-24 lg:py-36 bg-white border-t border-gray-200/70">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-14 gap-6">

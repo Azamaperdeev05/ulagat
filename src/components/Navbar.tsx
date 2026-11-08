@@ -38,7 +38,7 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
         isScrolled
-          ? 'bg-white/80 backdrop-blur-xl backdrop-saturate-150 border-b border-gray-200/60 py-3'
+          ? 'bg-[#faf8f5]/90 backdrop-blur-xl backdrop-saturate-150 border-b border-gray-200/80 py-3 shadow-xs'
           : 'bg-transparent py-5'
       }`}
     >
@@ -73,13 +73,14 @@ export default function Navbar() {
           ))}
           <Link
             to="/apply"
-            className={`px-5 py-2 text-[13px] font-medium rounded-full transition-all duration-300 hover:shadow-lg ${
+            className={`px-5 py-2.5 text-[13px] font-medium rounded-full transition-all duration-300 hover:shadow-md inline-flex items-center gap-1.5 ${
               isScrolled 
                 ? 'bg-gray-900 text-white hover:bg-gray-800' 
                 : 'bg-white text-gray-900 hover:bg-gray-100'
             }`}
           >
-            Қосылу
+            <span>Қосылу</span>
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent/20 text-accent font-semibold">2 000 ₸</span>
           </Link>
         </div>
 
@@ -103,7 +104,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-gray-200 md:hidden"
+            className="absolute top-full left-0 right-0 bg-[#faf8f5]/95 backdrop-blur-xl border-b border-gray-200 md:hidden shadow-lg"
           >
             <div className="flex flex-col px-6 py-4 gap-1">
               {navLinks.map((link) => (
@@ -119,9 +120,10 @@ export default function Navbar() {
               <Link
                 to="/apply"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="mt-3 px-5 py-3 bg-gray-900 text-white text-center text-[13px] font-medium rounded-full hover:bg-gray-800 transition-all"
+                className="mt-3 px-5 py-3 bg-gray-900 text-white text-center text-[13px] font-medium rounded-full hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
               >
-                Қосылу
+                <span>Қосылу</span>
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold">2 000 ₸</span>
               </Link>
             </div>
           </motion.div>

@@ -46,8 +46,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://wa.me/77784828985" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-[13px] text-gray-400 hover:text-white transition-colors">
-                  <Send className="w-3.5 h-3.5" /> WhatsApp
+                <a href="https://wa.me/77474476486" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-[13px] text-gray-400 hover:text-white transition-colors">
+                  <Send className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp (+7 747 447 6486 Айбану)
                 </a>
               </li>
               <li>

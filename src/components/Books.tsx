@@ -37,7 +37,7 @@ export default function Books() {
   }, []);
 
   return (
-    <section id="books" className="py-24 lg:py-36 bg-gray-50">
+    <section id="books" className="py-24 lg:py-36 bg-[#faf8f5]">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <motion.div

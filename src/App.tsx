@@ -45,7 +45,7 @@ export default function App() {
     <Router>
       <ScrollToTop />
       <AnalyticsTracker />
-      <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-white">
+      <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-[#faf8f5]">
         <Navbar />
         <main className="grow">
           <Routes>
