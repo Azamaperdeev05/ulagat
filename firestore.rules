@@ -3,16 +3,34 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Кітаптар — барлығы оқи алады, тек admin жаза алады (болашақта)
+    // Кітаптар
     match /books/{bookId} {
       allow read: if true;
-      allow write: if true; // Уақытша ашық, кейін admin auth қосамыз
+      allow write: if true;
       
-      // Пікірлер — барлығы оқи алады, кез-келген кіруші жаза алады
+      // Пікірлер
       match /comments/{commentId} {
         allow read: if true;
         allow write: if true;
       }
+    }
+
+    // Өтінімдер (Leads)
+    match /leads/{leadId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Іс-шаралар (Events)
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Баптаулар (Settings)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
     }
   }
 }

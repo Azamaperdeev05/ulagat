@@ -82,6 +82,7 @@ export default function Footer() {
           <div className="flex items-center gap-6">
             <Link to="/privacy" className="text-[12px] text-gray-500 hover:text-white transition-colors">Құпиялылық</Link>
             <Link to="/terms" className="text-[12px] text-gray-500 hover:text-white transition-colors">Шарттар</Link>
+            <Link to="/admin" className="text-[12px] text-gray-500 hover:text-white transition-colors">Әкімшілік</Link>
           </div>
         </div>
 

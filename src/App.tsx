@@ -9,6 +9,7 @@ import Ensemble from './pages/Ensemble';
 import Apply from './pages/Apply';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
+import Admin from './pages/Admin';
 import { trackPageView } from './lib/analytics';
 
 function ScrollToTop() {
@@ -40,28 +41,38 @@ function AnalyticsTracker() {
   return null;
 }
 
+function AppContent() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
+
+  return (
+    <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-[#faf8f5]">
+      {!isAdmin && <Navbar />}
+      <main className="grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/books/:slug" element={<BookThread />} />
+          <Route path="/ensemble" element={<Ensemble />} />
+          <Route path="/apply" element={<Apply />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
+          {/* Catch-all: redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Router>
       <ScrollToTop />
       <AnalyticsTracker />
-      <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-[#faf8f5]">
-        <Navbar />
-        <main className="grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/books/:slug" element={<BookThread />} />
-            <Route path="/ensemble" element={<Ensemble />} />
-            <Route path="/apply" element={<Apply />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            {/* Catch-all: redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-      </div>
+      <AppContent />
     </Router>
   );
 }

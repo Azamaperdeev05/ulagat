@@ -1,45 +1,20 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, MapPin } from 'lucide-react';
+import { subscribeEvents, EventItem } from '../lib/eventService';
 
 export default function Events() {
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: 'Поэзиялық кеш',
-      author: 'Қозы Көрпеш - Баян Сұлу мерекесі',
-      date: '11 Сәуір',
-      time: '17:00',
-      image: 'https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=600&auto=format&fit=crop', // spring/love aesthetics
-      link: 'https://koktem.vercel.app/'
-    },
-    {
-      id: 2,
-      title: 'Махаббат бекеті',
-      author: 'Сезімге толы әдемі кеш',
-      date: '19 Сәуір',
-      time: '14:00',
-      image: '/mahabbat.jpeg',
-    },
-    {
-      id: 3,
-      title: 'Көксерек (Жаңа топ)',
-      author: 'Мұхтар Әуезов',
-      date: '12 Сәуір',
-      time: '14:00',
-      image: 'https://simg.marwin.kz/media/catalog/product/f/i/uezov_m_kkserek.jpeg',
-    },
-    {
-      id: 4,
-      title: 'Тазының өлімі (Жалғастырушы)',
-      author: 'Мұхтар Мағауин (Қисық ағаш)',
-      date: '12 Сәуір',
-      time: '16:00',
-      image: 'https://resources.cdn-kaspi.kz/img/m/p/p7d/pb7/1453139.jpeg?format=gallery-medium',
-    },
-  ];
+  const [events, setEvents] = useState<EventItem[]>([]);
+
+  useEffect(() => {
+    const unsub = subscribeEvents((list) => {
+      setEvents(list);
+    });
+    return () => unsub();
+  }, []);
 
   return (
-    <section id="events" className="py-16 lg:py-24 bg-white">
+    <section id="events" className="py-16 lg:py-24 bg-white border-y border-gray-200/60">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <motion.div
@@ -59,7 +34,7 @@ export default function Events() {
 
         {/* Events Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {upcomingEvents.map((event, idx) => {
+          {events.map((event, idx) => {
             const ContentWrapper = event.link ? 'a' : 'div';
             return (
               <motion.div
@@ -68,7 +43,7 @@ export default function Events() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="group bg-gray-50 rounded-xl sm:rounded-2xl overflow-hidden border border-gray-200/80 hover:border-accent/40 hover:shadow-xl transition-all duration-300 flex flex-col h-full cursor-pointer"
+                className="group bg-[#faf8f5] rounded-xl sm:rounded-2xl overflow-hidden border border-gray-200/80 hover:border-accent/40 hover:shadow-xl transition-all duration-300 flex flex-col h-full cursor-pointer"
               >
                 <ContentWrapper 
                   href={event.link} 
@@ -77,7 +52,7 @@ export default function Events() {
                   className="flex flex-col h-full"
                 >
                   {/* Image */}
-                  <div className="relative overflow-hidden aspect-square sm:aspect-[4/5] object-cover">
+                  <div className="relative overflow-hidden aspect-square sm:aspect-[4/5] object-cover bg-gray-100">
                     <img
                       src={event.image}
                       alt={event.title}
@@ -89,13 +64,13 @@ export default function Events() {
 
                   {/* Content */}
                   <div className="flex flex-col flex-1 p-3 sm:p-5">
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3 text-[10px] sm:text-[11px] font-medium text-gray-500">
-                      <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-md border border-gray-200 shadow-sm">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3 text-[10px] sm:text-[11px] font-medium text-gray-500">
+                      <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-md border border-gray-200/80 shadow-xs">
                         <Calendar className="w-3 h-3 text-accent" />
                         {event.date}
                       </div>
                       {event.time && (
-                        <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-md border border-gray-200 shadow-sm">
+                        <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-md border border-gray-200/80 shadow-xs">
                           <Clock className="w-3 h-3 text-accent" />
                           {event.time}
                         </div>
@@ -109,11 +84,16 @@ export default function Events() {
                         {event.author}
                       </p>
                     )}
+                    {event.location && (
+                      <div className="flex items-center gap-1 text-[11px] text-gray-400 mt-2">
+                        <MapPin className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{event.location}</span>
+                      </div>
+                    )}
                     
-                    {/* Optional Button for external links */}
                     {event.link && (
                       <div className="mt-auto pt-4 w-full">
-                        <span className="inline-flex w-full items-center justify-center px-4 py-2.5 bg-gray-900 text-white text-[12px] sm:text-[13px] font-medium rounded-lg group-hover:bg-accent transition-colors">
+                        <span className="inline-flex w-full items-center justify-center px-4 py-2 bg-gray-900 text-white text-[12px] font-medium rounded-lg group-hover:bg-accent transition-colors">
                           Сайтқа өту
                         </span>
                       </div>
